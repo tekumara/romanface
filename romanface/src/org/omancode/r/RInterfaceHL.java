@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.omancode.r.types.REXPAttr;
 import org.omancode.r.types.REXPUtil;
 import org.omancode.r.types.RMatrix;
 import org.omancode.util.ArrayUtil;
@@ -323,7 +324,7 @@ public final class RInterfaceHL {
 			}
 
 			String[] values = rexp.asStrings();
-			String[] names = REXPUtil.getNamesAttribute(rexp);
+			String[] names = REXPAttr.getNamesAttribute(rexp);
 
 			for (int i = 0; i < values.length; i++) {
 				map.put(names[i], values[i]);
@@ -693,7 +694,7 @@ public final class RInterfaceHL {
 			Object value = entry.getValue();
 
 			// convert value to REXP and store in hash
-			REXP rexp = RUtil.toREXP(value);
+			REXP rexp = REXPUtil.toREXP(value);
 			assign(".hashValue", rexp);
 			parseEvalTry(name + "[[\"" + key + "\"]] <- .hashValue");
 		}

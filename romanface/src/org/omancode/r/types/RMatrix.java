@@ -100,7 +100,7 @@ public class RMatrix implements CBuilder {
 		}
 
 		// get names of the dimensions (dimnames)
-		String[] namesDimNames = REXPUtil.getNamesDimNames(rexp);
+		String[] namesDimNames = REXPAttr.getNamesDimNames(rexp);
 		rowVariableName = (namesDimNames == null) ? ""
 				: namesDimNames[0]
 						+ (!("".equals(namesDimNames[0]) || ""
@@ -142,7 +142,7 @@ public class RMatrix implements CBuilder {
 	 */
 	public static boolean isMatrix(REXP rexp) {
 
-		return ((rexp instanceof REXPDouble || rexp instanceof REXPInteger) && (REXPUtil
+		return ((rexp instanceof REXPDouble || rexp instanceof REXPInteger) && (REXPAttr
 				.getDimensions(rexp) == 2));
 	}
 

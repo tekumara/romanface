@@ -2,7 +2,7 @@ package org.omancode.r;
 
 import java.io.IOException;
 
-import org.omancode.r.types.REXPUtil;
+import org.omancode.r.types.REXPAttr;
 import org.rosuda.REngine.REXP;
 
 /**
@@ -83,7 +83,7 @@ public class RInterfaceException extends IOException {
 
 	/**
 	 * Create an {@link RInterfaceException} with details of the rexp included
-	 * in the message.
+	 * in the message and the original R expression executed.
 	 * 
 	 * @param expr
 	 *            R cmd executed, or {@code null}
@@ -117,8 +117,8 @@ public class RInterfaceException extends IOException {
 			msg.append(expr).append(" returned result of ");
 		}
 
-		msg.append("class ").append(REXPUtil.getClassAttribute(rexp)).append(
-				" with dimensions = ").append(REXPUtil.getDimensions(rexp))
+		msg.append("class ").append(REXPAttr.getClassAttribute(rexp)).append(
+				" with dimensions = ").append(REXPAttr.getDimensions(rexp))
 				.append(".\n").append(message);
 
 		return msg.toString();

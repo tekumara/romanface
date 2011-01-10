@@ -80,7 +80,7 @@ public class RObjectTreeBuilder {
 	public RObjectTreeBuilder(RInterfaceHL rInterface, String dataframe,
 			String[] includeClass) throws RInterfaceException {
 		this.rInterface = rInterface;
-		this.include = RUtil.toVectorExpr(includeClass);
+		this.include = RUtil.toVectorExprString(includeClass);
 
 		if (dataframe == null) {
 			root = new DefaultMutableTreeNode("R");

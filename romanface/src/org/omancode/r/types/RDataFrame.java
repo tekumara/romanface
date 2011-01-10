@@ -8,7 +8,6 @@ import java.util.Map;
 import net.casper.data.model.CBuilder;
 
 import org.omancode.r.RInterfaceException;
-import org.omancode.r.RUtil;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPMismatchException;
@@ -59,7 +58,7 @@ public class RDataFrame implements CBuilder {
 		try {
 			// convert rlist to list of rvectors
 			RList rlist = rexp.asList();
-			rvectors = RUtil.toRVectors(rlist);
+			rvectors = RVector.toRVectors(rlist);
 
 			// get column types and number of rows
 			columnTypes = calcColumnTypes(rvectors);
@@ -99,7 +98,7 @@ public class RDataFrame implements CBuilder {
 	 * @return true/false
 	 */
 	public static boolean isDataFrame(REXP rexp) {
-		String clazz = REXPUtil.getClassAttribute(rexp);
+		String clazz = REXPAttr.getClassAttribute(rexp);
 		return clazz.contains("data.frame");
 	}
 

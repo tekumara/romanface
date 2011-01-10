@@ -15,7 +15,6 @@ import java.util.Map;
 import net.casper.data.model.CBuilder;
 
 import org.omancode.r.RInterfaceException;
-import org.omancode.r.RUtil;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPFactor;
 import org.rosuda.REngine.REXPGenericVector;
@@ -155,11 +154,13 @@ public class RVector implements CBuilder {
 	 *             corresponding primitive list implementation exists)
 	 * @throws RInterfaceException
 	 *             if {@code rexp} cannot be converted to a primitive array list
-	 * @throws RInterfaceException
+	 * @throws REXPMismatchException
+	 *             if problem determining {@code dimnames} attribute.
 	 */
 	public RVector(String name, REXPVector rexp)
-			throws UnsupportedTypeException, RInterfaceException {
-		this(name, calcJavaType(rexp), createList(rexp), REXPUtil
+			throws UnsupportedTypeException, RInterfaceException,
+			REXPMismatchException {
+		this(name, calcJavaType(rexp), createList(rexp), REXPAttr
 				.getNamesAttribute(rexp));
 	}
 
@@ -298,7 +299,7 @@ public class RVector implements CBuilder {
 		} else if (klass.isArray()) {
 			// this must be an array object passed in, so wrap it in a
 			// REXPVector
-			values.add(RUtil.toVector(value));
+			values.add(REXPUtil.toVector(value));
 		} else {
 			values.add(value);
 		}
@@ -372,14 +373,13 @@ public class RVector implements CBuilder {
 		} else if (values instanceof BooleanArrayList) {
 			return new REXPLogical(((BooleanArrayList) values).elements());
 		} else if (values instanceof ArrayList<?>) {
-			return new REXPString(((ArrayList<?>) values)
-					.toArray(new String[values.size()]));
+			return new REXPString(
+					((ArrayList<?>) values).toArray(new String[values.size()]));
 		} else if (values instanceof RList) {
 			return new REXPGenericVector((RList) values);
 		} else {
-			throw new UnsupportedTypeException(
-					"Unsupported backing list type "
-							+ values.getClass().getCanonicalName());
+			throw new UnsupportedTypeException("Unsupported backing list type "
+					+ values.getClass().getCanonicalName());
 		}
 
 	}
@@ -440,5 +440,43 @@ public class RVector implements CBuilder {
 
 		currentPosIndex++;
 		return row;
+	}
+
+	/**
+	 * Create a list of {@link RVector}s from an {@link RList}.
+	 * 
+	 * @param rlist
+	 *            rlist
+	 * @return list of {@link RVector}s.
+	 * @throws UnsupportedTypeException
+	 *             if {@code rlist} contains a type than cannot be converted to
+	 *             an {@link RVector}.
+	 * @throws RInterfaceException
+	 *             if problem converting a member of the {@code rlist} to a
+	 *             {@link RVector}.
+	 * @throws REXPMismatchException
+	 *             if problem determining {@code dimnames} attribute.
+	 */
+	public static List<RVector> toRVectors(RList rlist)
+			throws UnsupportedTypeException, RInterfaceException,
+			REXPMismatchException {
+		ArrayList<RVector> rVectors = new ArrayList<RVector>(rlist.size());
+
+		int index = 0;
+		for (Object element : rlist) {
+
+			if (element instanceof REXPVector) {
+				REXPVector rexp = (REXPVector) element;
+
+				rVectors.add(new RVector((String) rlist.names.get(index++),
+						rexp));
+			} else {
+				throw new UnsupportedTypeException("rlist contains "
+						+ element.getClass().getCanonicalName());
+			}
+
+		}
+
+		return rVectors;
 	}
 }
