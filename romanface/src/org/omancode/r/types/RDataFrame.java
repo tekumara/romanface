@@ -58,7 +58,7 @@ public class RDataFrame implements CBuilder {
 		try {
 			// convert rlist to list of rvectors
 			RList rlist = rexp.asList();
-			rvectors = RVector.toRVectors(rlist);
+			rvectors = RVectors.createVectorList(rlist);
 
 			// get column types and number of rows
 			columnTypes = calcColumnTypes(rvectors);

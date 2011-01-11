@@ -152,14 +152,11 @@ public class RVector implements CBuilder {
 	 * @throws UnsupportedTypeException
 	 *             if {@code rexp} is of an unsupported type (ie: no
 	 *             corresponding primitive list implementation exists)
-	 * @throws RInterfaceException
-	 *             if {@code rexp} cannot be converted to a primitive array list
 	 * @throws REXPMismatchException
 	 *             if problem determining {@code dimnames} attribute.
 	 */
 	public RVector(String name, REXPVector rexp)
-			throws UnsupportedTypeException, RInterfaceException,
-			REXPMismatchException {
+			throws UnsupportedTypeException, REXPMismatchException {
 		this(name, calcJavaType(rexp), createList(rexp), REXPAttr
 				.getNamesAttribute(rexp));
 	}
@@ -203,29 +200,25 @@ public class RVector implements CBuilder {
 	 * @throws UnsupportedTypeException
 	 *             if {@code rexp} is of an unsupported type (ie: no
 	 *             corresponding primitive list implementation exists)
-	 * @throws RInterfaceException
-	 *             if {@code rexp} cannot be converted to a primitive array list
+	 * @throws REXPMismatchException
+	 *             if {@code rexp} cannot be accessed
 	 */
 	private static List createList(REXPVector rexp)
-			throws UnsupportedTypeException, RInterfaceException {
-		try {
-			if (rexp instanceof REXPDouble) {
-				return new DoubleArrayList(rexp.asDoubles());
-			} else if (rexp instanceof REXPFactor) {
-				return Arrays.asList(rexp.asStrings());
-			} else if (rexp instanceof REXPInteger) {
-				return new IntArrayList(rexp.asIntegers());
-			} else if (rexp instanceof REXPLogical) {
-				return new IntArrayList(rexp.asIntegers());
-			} else if (rexp instanceof REXPString) {
-				return Arrays.asList(rexp.asStrings());
-			} else if (rexp instanceof REXPRaw) {
-				return new ByteArrayList(rexp.asBytes());
-			} else {
-				throw new UnsupportedTypeException(rexp.getClass());
-			}
-		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throws UnsupportedTypeException, REXPMismatchException {
+		if (rexp instanceof REXPDouble) {
+			return new DoubleArrayList(rexp.asDoubles());
+		} else if (rexp instanceof REXPFactor) {
+			return Arrays.asList(rexp.asStrings());
+		} else if (rexp instanceof REXPInteger) {
+			return new IntArrayList(rexp.asIntegers());
+		} else if (rexp instanceof REXPLogical) {
+			return new IntArrayList(rexp.asIntegers());
+		} else if (rexp instanceof REXPString) {
+			return Arrays.asList(rexp.asStrings());
+		} else if (rexp instanceof REXPRaw) {
+			return new ByteArrayList(rexp.asBytes());
+		} else {
+			throw new UnsupportedTypeException(rexp.getClass());
 		}
 	}
 
@@ -440,43 +433,5 @@ public class RVector implements CBuilder {
 
 		currentPosIndex++;
 		return row;
-	}
-
-	/**
-	 * Create a list of {@link RVector}s from an {@link RList}.
-	 * 
-	 * @param rlist
-	 *            rlist
-	 * @return list of {@link RVector}s.
-	 * @throws UnsupportedTypeException
-	 *             if {@code rlist} contains a type than cannot be converted to
-	 *             an {@link RVector}.
-	 * @throws RInterfaceException
-	 *             if problem converting a member of the {@code rlist} to a
-	 *             {@link RVector}.
-	 * @throws REXPMismatchException
-	 *             if problem determining {@code dimnames} attribute.
-	 */
-	public static List<RVector> toRVectors(RList rlist)
-			throws UnsupportedTypeException, RInterfaceException,
-			REXPMismatchException {
-		ArrayList<RVector> rVectors = new ArrayList<RVector>(rlist.size());
-
-		int index = 0;
-		for (Object element : rlist) {
-
-			if (element instanceof REXPVector) {
-				REXPVector rexp = (REXPVector) element;
-
-				rVectors.add(new RVector((String) rlist.names.get(index++),
-						rexp));
-			} else {
-				throw new UnsupportedTypeException("rlist contains "
-						+ element.getClass().getCanonicalName());
-			}
-
-		}
-
-		return rVectors;
 	}
 }
