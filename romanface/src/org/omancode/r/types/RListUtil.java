@@ -1,18 +1,13 @@
 package org.omancode.r.types;
 
-import java.beans.IntrospectionException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import net.casper.data.model.CDataCacheContainer;
 import net.casper.data.model.CDataGridException;
 import net.casper.data.model.CDataRowSet;
-import net.casper.data.model.CMarkedUpRow;
 import net.casper.data.model.CRowMetaData;
 
 import org.omancode.r.RInterfaceException;
-import org.omancode.util.beans.BeanPropertyInspector;
 import org.rosuda.REngine.RList;
 
 /**
@@ -78,36 +73,4 @@ public final class RListUtil {
 		return RVectors.toRList(vectors);
 	}
 
-	/**
-	 * Create an {@link RList} from the given Collection. Introspection is used
-	 * to determine the bean properties (i.e.: getter methods) that are exposed,
-	 * and each one becomes a column in the dataframe. Columns are only created
-	 * for primitive properties and arrays of primitive properties; object
-	 * properties are ignored without warning.
-	 * 
-	 * If one of the properties is a {@link CMarkedUpRow} then this will be
-	 * extracted and included in its entirety.
-	 * 
-	 * NB: doesn't automatically create factors like read.table does.
-	 * 
-	 * @param col
-	 *            the Java collection to convert.
-	 * @param stopClass
-	 *            Columns are created for all getter methods that are defined by
-	 *            {@code stopClass}'s subclasses. {@code stopClass}'s getter
-	 *            methods and superclass getter methods are not converted to
-	 *            columns in the dataframe.
-	 * @return rlist rlist
-	 * @throws RInterfaceException
-	 *             if Collection cannot be read, or dataframe cannot be created.
-	 */
-	public static RList toRList(Collection<?> col, Class<?> stopClass)
-			throws RInterfaceException {
-		
-		try {
-			return new CMarkedUpRowBeanCollectionToR(col, stopClass).createRList();
-		} catch (IntrospectionException e) {
-			throw new RInterfaceException(e);
-		}
-	}
 }

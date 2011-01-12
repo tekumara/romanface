@@ -18,7 +18,14 @@ import org.rosuda.REngine.RList;
  */
 public class CollectionToR {
 
+	/**
+	 * {@link BeanPropertyInspector} for the collection.
+	 */
 	protected final BeanPropertyInspector props;
+	
+	/**
+	 * List of {@link RVector}s generated for the collection.
+	 */
 	protected final List<RVector> vectors;
 
 	/**
@@ -88,7 +95,7 @@ public class CollectionToR {
 	}
 
 	/**
-	 * Return an {@link RList} of the vectors.
+	 * Create an {@link RList} of the vectors.
 	 * 
 	 * @return rlist rlist
 	 * @throws RInterfaceException

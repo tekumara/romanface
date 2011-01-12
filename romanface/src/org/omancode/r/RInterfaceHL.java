@@ -664,9 +664,7 @@ public final class RInterfaceHL {
 			REXP dataframe = REXP.createDataFrame(rlist);
 
 			// assign the dataframe to a named R object
-			rosudaEngine.assign(name, dataframe);
-		} catch (REngineException e) {
-			throw new RInterfaceException(e);
+			assign(name, dataframe);
 		} catch (REXPMismatchException e) {
 			throw new RInterfaceException(e);
 		}
