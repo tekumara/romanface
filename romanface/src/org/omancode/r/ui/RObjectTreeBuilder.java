@@ -5,8 +5,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.omancode.r.RInterfaceException;
-import org.omancode.r.RInterfaceHL;
+import org.omancode.r.RFaceException;
+import org.omancode.r.RFace;
 import org.omancode.r.RUtil;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.RList;
@@ -20,7 +20,7 @@ import org.rosuda.REngine.RList;
  */
 public class RObjectTreeBuilder {
 
-	private final RInterfaceHL rInterface;
+	private final RFace rInterface;
 	private final JTree tree = new JTree();
 	private final DefaultMutableTreeNode root;
 	private final DefaultTreeModel model;
@@ -32,11 +32,11 @@ public class RObjectTreeBuilder {
 	 * 
 	 * @param rInterface
 	 *            r interface
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem getting objects
 	 */
-	public RObjectTreeBuilder(RInterfaceHL rInterface)
-			throws RInterfaceException {
+	public RObjectTreeBuilder(RFace rInterface)
+			throws RFaceException {
 		this(rInterface, null, "all");
 	}
 
@@ -53,11 +53,11 @@ public class RObjectTreeBuilder {
 	 * @param includeClass
 	 *            specify a single class of object to display, or {@code null}
 	 *            to display objects of any class.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem getting objects
 	 */
-	public RObjectTreeBuilder(RInterfaceHL rInterface, String dataframe,
-			String includeClass) throws RInterfaceException {
+	public RObjectTreeBuilder(RFace rInterface, String dataframe,
+			String includeClass) throws RFaceException {
 		this(rInterface, dataframe, new String[] { includeClass });
 	}
 
@@ -74,11 +74,11 @@ public class RObjectTreeBuilder {
 	 * @param includeClass
 	 *            specify the classes of object to display, or {@code null} to
 	 *            display objects of any class.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem getting objects
 	 */
-	public RObjectTreeBuilder(RInterfaceHL rInterface, String dataframe,
-			String[] includeClass) throws RInterfaceException {
+	public RObjectTreeBuilder(RFace rInterface, String dataframe,
+			String[] includeClass) throws RFaceException {
 		this.rInterface = rInterface;
 		this.include = RUtil.toVectorExprString(includeClass);
 
@@ -127,7 +127,7 @@ public class RObjectTreeBuilder {
 
 	}
 
-	private RObjectNode[] getObjects() throws RInterfaceException {
+	private RObjectNode[] getObjects() throws RFaceException {
 		String expr = ".getObjects(include=" + include + ")";
 		return getNodes(expr);
 	}
@@ -139,11 +139,11 @@ public class RObjectTreeBuilder {
 	 * @param rname
 	 *            r object name
 	 * @return array of nodes created from parts
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem getting part information from R
 	 */
 	public final RObjectNode[] getParts(String rname)
-			throws RInterfaceException {
+			throws RFaceException {
 		String expr = ".getParts(" + rname + ", include=" + include + ")";
 		return getNodes(expr);
 	}
@@ -156,10 +156,10 @@ public class RObjectTreeBuilder {
 	 *            r expression
 	 * @return array of nodes created from expr, or an array with nothing if
 	 *         expr returns nothing.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem evaluating expr
 	 */
-	private RObjectNode[] getNodes(String expr) throws RInterfaceException {
+	private RObjectNode[] getNodes(String expr) throws RFaceException {
 		RList rlist = rInterface.parseEvalTryAsRList(expr);
 
 		if (rlist == null) {
@@ -194,7 +194,7 @@ public class RObjectTreeBuilder {
 			String info = rInterface.evalReturnString(expr);
 
 			return info;
-		} catch (RInterfaceException e) {
+		} catch (RFaceException e) {
 			throw new RuntimeException(e);
 		}
 	}

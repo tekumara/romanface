@@ -6,7 +6,7 @@ import java.util.Map;
 import net.casper.data.model.CBuilder;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
@@ -28,11 +28,11 @@ public class CBuildFromREXP implements CBuilder {
 	 *            rexp
 	 * @param name
 	 *            name of dataset
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if dataset cannot be built from this REXP
 	 */
 	public CBuildFromREXP(REXP rexp, String name)
-			throws RInterfaceException {
+			throws RFaceException {
 	
 		try {
 			if (RMatrix.isMatrix(rexp)) {
@@ -49,9 +49,9 @@ public class CBuildFromREXP implements CBuilder {
 			}
 
 		} catch (UnsupportedTypeException e) {
-			throw new RInterfaceException(e.getMessage(), e);
+			throw new RFaceException(e.getMessage(), e);
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e.getMessage(), e);
+			throw new RFaceException(e.getMessage(), e);
 		}
 	
 	}

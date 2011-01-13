@@ -3,7 +3,7 @@ package org.omancode.r.ui;
 import javax.swing.tree.MutableTreeNode;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.omancode.util.swing.LazyMutableTreeNode;
 
 /**
@@ -74,7 +74,7 @@ public class RObjectNode extends LazyMutableTreeNode {
 	protected void createChildren() {
 		try {
 			rotb.addNodes(this, rotb.getParts(getRName()));
-		} catch (RInterfaceException e) {
+		} catch (RFaceException e) {
 			throw new RuntimeException(e);
 		}
 	}

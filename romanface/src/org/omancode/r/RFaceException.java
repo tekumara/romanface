@@ -11,7 +11,7 @@ import org.rosuda.REngine.REXP;
  * @author Oliver Mannion
  * @version $Revision$
  */
-public class RInterfaceException extends IOException {
+public class RFaceException extends IOException {
 
 	/**
 	 * Serialization ID.
@@ -33,7 +33,7 @@ public class RInterfaceException extends IOException {
 	 *            permitted, and indicates that the cause is nonexistent or
 	 *            unknown.)
 	 */
-	public RInterfaceException(String message, Throwable cause) {
+	public RFaceException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -46,7 +46,7 @@ public class RInterfaceException extends IOException {
 	 *            the detail message. The detail message is saved for later
 	 *            retrieval by the {@link #getMessage()} method.
 	 */
-	public RInterfaceException(String message) {
+	public RFaceException(String message) {
 		super(message);
 	}
 
@@ -64,12 +64,12 @@ public class RInterfaceException extends IOException {
 	 *            permitted, and indicates that the cause is nonexistent or
 	 *            unknown.)
 	 */
-	public RInterfaceException(Throwable cause) {
+	public RFaceException(Throwable cause) {
 		super(cause);
 	}
 
 	/**
-	 * Create an {@link RInterfaceException} with details of the rexp included
+	 * Create an {@link RFaceException} with details of the rexp included
 	 * in the message.
 	 * 
 	 * @param rexp
@@ -77,12 +77,12 @@ public class RInterfaceException extends IOException {
 	 * @param message
 	 *            message
 	 */
-	public RInterfaceException(REXP rexp, String message) {
+	public RFaceException(REXP rexp, String message) {
 		super(createExceptionMessage(null, rexp, message));
 	}
 
 	/**
-	 * Create an {@link RInterfaceException} with details of the rexp included
+	 * Create an {@link RFaceException} with details of the rexp included
 	 * in the message and the original R expression executed.
 	 * 
 	 * @param expr
@@ -92,7 +92,7 @@ public class RInterfaceException extends IOException {
 	 * @param message
 	 *            message
 	 */
-	public RInterfaceException(String expr, REXP rexp, String message) {
+	public RFaceException(String expr, REXP rexp, String message) {
 		super(createExceptionMessage(expr, rexp, message));
 	}
 
@@ -105,7 +105,7 @@ public class RInterfaceException extends IOException {
 	 *            rexp to interrogate
 	 * @param message
 	 *            message
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             new exception
 	 */
 	private static String createExceptionMessage(String expr, REXP rexp,

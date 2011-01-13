@@ -7,7 +7,7 @@ import java.util.Map;
 import net.casper.data.model.CBuilder;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.omancode.rmt.cellreader.narrow.NarrowException;
 import org.omancode.rmt.cellreader.narrow.NarrowUtil;
 import org.rosuda.REngine.REXP;
@@ -90,12 +90,12 @@ public class RMatrix implements CBuilder {
 	 *            and row variable names.
 	 * @param rexp
 	 *            R expression
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if rexp is not an {@link REXPDouble} or an R table class.
 	 */
-	public RMatrix(String name, REXP rexp) throws RInterfaceException {
+	public RMatrix(String name, REXP rexp) throws RFaceException {
 		if (!RMatrix.isMatrix(rexp)) {
-			throw new RInterfaceException(rexp,
+			throw new RFaceException(rexp,
 					"Cannot be accessed as a RMatrix");
 		}
 
@@ -126,7 +126,7 @@ public class RMatrix implements CBuilder {
 			numRows = rexp.dim()[0];
 
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 
 	}

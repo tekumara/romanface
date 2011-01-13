@@ -14,7 +14,6 @@ import java.util.Map;
 
 import net.casper.data.model.CBuilder;
 
-import org.omancode.r.RInterfaceException;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPFactor;
 import org.rosuda.REngine.REXPGenericVector;

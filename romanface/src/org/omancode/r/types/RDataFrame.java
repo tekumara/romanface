@@ -7,7 +7,7 @@ import java.util.Map;
 
 import net.casper.data.model.CBuilder;
 
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPMismatchException;
@@ -38,17 +38,17 @@ public class RDataFrame implements CBuilder {
 	 *            and row variable names.
 	 * @param rexp
 	 *            R expression
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if rexp is not an {@link REXPGenericVector} or an R dataframe
 	 *             class.
 	 * @throws UnsupportedTypeException
 	 *             if {@code rexp} contains a type that cannot be handled
 	 */
-	public RDataFrame(String name, REXP rexp) throws RInterfaceException,
+	public RDataFrame(String name, REXP rexp) throws RFaceException,
 			UnsupportedTypeException {
 		if (!RDataFrame.isDataFrame(rexp)
 				|| !(rexp instanceof REXPGenericVector)) {
-			throw new RInterfaceException(rexp,
+			throw new RFaceException(rexp,
 					"Cannot be accessed as a RDataFrame");
 		}
 
@@ -58,13 +58,13 @@ public class RDataFrame implements CBuilder {
 		try {
 			// convert rlist to list of rvectors
 			RList rlist = rexp.asList();
-			rvectors = RVectorUtil.createVectorList(rlist);
+			rvectors = new RVectorList(rlist);
 
 			// get column types and number of rows
 			columnTypes = calcColumnTypes(rvectors);
 			numRows = rvectors.get(0).size();
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 	}
 

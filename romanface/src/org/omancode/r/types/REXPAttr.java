@@ -2,7 +2,7 @@ package org.omancode.r.types;
 
 import java.util.Arrays;
 
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPMismatchException;

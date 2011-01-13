@@ -43,13 +43,13 @@ import org.rosuda.REngine.JRI.JRIEngine;
  * @author Oliver Mannion
  * @version $Revision$
  */
-public final class RInterfaceHL {
+public final class RFace {
 
 	/**
 	 * Support file containing R functions to load into R environment on
 	 * startup.
 	 */
-	private static final String SUPPORT_FILE = "RInterfaceHL.r";
+	private static final String SUPPORT_FILE = "RFace.r";
 
 	/**
 	 * Newline.
@@ -59,7 +59,7 @@ public final class RInterfaceHL {
 	/**
 	 * Private constructor prevents instantiation from other classes.
 	 */
-	private RInterfaceHL() {
+	private RFace() {
 	}
 
 	/**
@@ -77,7 +77,7 @@ public final class RInterfaceHL {
 		/**
 		 * Singleton instance, with static initializer.
 		 */
-		private static final RInterfaceHL INSTANCE = initRInterfaceHL();
+		private static final RFace INSTANCE = initRInterfaceHL();
 
 		/**
 		 * Initialize RInterfaceHL singleton instance using rLoopHandler from
@@ -85,10 +85,10 @@ public final class RInterfaceHL {
 		 * 
 		 * @return RInterfaceHL instance
 		 */
-		private static RInterfaceHL initRInterfaceHL() {
+		private static RFace initRInterfaceHL() {
 			try {
-				return new RInterfaceHL(rloopHandler); // NOPMD
-			} catch (RInterfaceException e) {
+				return new RFace(rloopHandler); // NOPMD
+			} catch (RFaceException e) {
 				// a static initializer cannot throw exceptions
 				// but it can throw an ExceptionInInitializerError
 				throw new ExceptionInInitializerError(e);
@@ -106,7 +106,7 @@ public final class RInterfaceHL {
 		 * 
 		 * @return RInterfaceHL singleton.
 		 */
-		public static RInterfaceHL getInstance() {
+		public static RFace getInstance() {
 			return SingletonHolder.INSTANCE;
 		}
 
@@ -119,12 +119,12 @@ public final class RInterfaceHL {
 	 * @param rloopHandler
 	 *            R REPL handler supplied by client.
 	 * @return RInterfaceHL singleton instance
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if REngine cannot be created
 	 */
-	public static RInterfaceHL getInstance(RMainLoopCallbacks rloopHandler)
-			throws RInterfaceException {
-		RInterfaceHL.rloopHandler = rloopHandler;
+	public static RFace getInstance(RMainLoopCallbacks rloopHandler)
+			throws RFaceException {
+		RFace.rloopHandler = rloopHandler;
 
 		try {
 			return SingletonHolder.getInstance();
@@ -133,7 +133,7 @@ public final class RInterfaceHL {
 			// re-throw exception that occurred in the initializer
 			// so our caller can deal with it
 			Throwable eInInit = e.getCause();
-			throw new RInterfaceException(eInInit.getMessage(), eInInit); // NOPMD
+			throw new RFaceException(eInInit.getMessage(), eInInit); // NOPMD
 		}
 	}
 
@@ -152,10 +152,10 @@ public final class RInterfaceHL {
 	 *            R REPL handler supplied by client.
 	 * @throws REngineException
 	 *             if R cannot be loaded.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 */
-	private RInterfaceHL(RMainLoopCallbacks rloopHandler)
-			throws RInterfaceException {
+	private RFace(RMainLoopCallbacks rloopHandler)
+			throws RFaceException {
 
 		// tell Rengine code not to die if it can't
 		// load the JRI native DLLs. This allows
@@ -180,7 +180,7 @@ public final class RInterfaceHL {
 			System.err.format("%s=%s%n", "R_HOME", System.getenv()
 					.get("R_HOME"));
 
-			throw new RInterfaceException(e.getMessage(), e);
+			throw new RFaceException(e.getMessage(), e);
 		}
 	}
 
@@ -214,13 +214,13 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to evaluate.
 	 * @return REXP result of the evaluation. Not printed to the console.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation. Parse errors will
 	 *             simply return the message "parse error". Any evaluation
 	 *             errors with have the error messages printed to the console
 	 *             and return the exception message "error during evaluation".
 	 */
-	public REXP eval(String expr) throws RInterfaceException {
+	public REXP eval(String expr) throws RFaceException {
 		if (!initialized()) {
 			throw new IllegalStateException("REngine has not been initialized.");
 		}
@@ -228,9 +228,9 @@ public final class RInterfaceHL {
 		try {
 			return rosudaEngine.parseAndEval(expr);
 		} catch (REngineException e) {
-			throw new RInterfaceException(expr + ": " + e.getMessage(), e);
+			throw new RFaceException(expr + ": " + e.getMessage(), e);
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(expr + ": " + e.getMessage(), e);
+			throw new RFaceException(expr + ": " + e.getMessage(), e);
 		}
 	}
 
@@ -240,11 +240,11 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to evaluate.
 	 * @return String array or {@code null}.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation, or expression does not
 	 *             return a {@link REXPString}.
 	 */
-	public String[] evalReturnStrings(String expr) throws RInterfaceException {
+	public String[] evalReturnStrings(String expr) throws RFaceException {
 		try {
 			REXP rexp = eval(expr);
 
@@ -254,19 +254,19 @@ public final class RInterfaceHL {
 
 			// r command must return a REXPString
 			if (!(rexp instanceof REXPString)) {
-				throw new RInterfaceException(expr + " returned "
+				throw new RFaceException(expr + " returned "
 						+ rexp.getClass().getCanonicalName()
 						+ " instead of REXPString");
 			}
 
 			return rexp.asStrings();
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e.getMessage(), e);
+			throw new RFaceException(e.getMessage(), e);
 		}
 	}
 
 	public Map<String, String> evalReturnNamedStringsSorted(String expr)
-			throws RInterfaceException {
+			throws RFaceException {
 		Map<String, String> namedStrings = new TreeMap<String, String>();
 
 		return evalReturnNamedStrings(expr, namedStrings);
@@ -282,12 +282,12 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to evaluate.
 	 * @return map of named strings
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation, or expression does not
 	 *             return a {@link REXPString}.
 	 */
 	public Map<String, String> evalReturnNamedStrings(String expr)
-			throws RInterfaceException {
+			throws RFaceException {
 		Map<String, String> namedStrings = new LinkedHashMap<String, String>();
 
 		return evalReturnNamedStrings(expr, namedStrings);
@@ -305,12 +305,12 @@ public final class RInterfaceHL {
 	 * @param map
 	 *            to fill with strings
 	 * @return map of named strings
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation, or expression does not
 	 *             return a {@link REXPString}.
 	 */
 	public Map<String, String> evalReturnNamedStrings(String expr,
-			Map<String, String> map) throws RInterfaceException {
+			Map<String, String> map) throws RFaceException {
 		try {
 			REXP rexp = eval(expr);
 
@@ -318,7 +318,7 @@ public final class RInterfaceHL {
 			if (rexp instanceof REXPNull) {
 				return Collections.emptyMap();
 			} else if (!(rexp instanceof REXPString)) {
-				throw new RInterfaceException(expr + " returned "
+				throw new RFaceException(expr + " returned "
 						+ rexp.getClass().getCanonicalName()
 						+ " instead of REXPString");
 			}
@@ -333,7 +333,7 @@ public final class RInterfaceHL {
 			return map;
 
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e.getMessage(), e);
+			throw new RFaceException(e.getMessage(), e);
 		}
 	}
 
@@ -346,11 +346,11 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to evaluate.
 	 * @return console output from the evaluation.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation. Parse errors will
 	 *             simply return the message "parse error".
 	 */
-	public String evalCaptureOutput(String expr) throws RInterfaceException {
+	public String evalCaptureOutput(String expr) throws RFaceException {
 		return evalReturnString("capture.output(" + expr + ")");
 	}
 
@@ -362,11 +362,11 @@ public final class RInterfaceHL {
 	 *            expression to evaluate.
 	 * @return String with newlines between elements, or {@code null} if expr
 	 *         returns {@code null}.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during parse or evaluation, or expression does not
 	 *             return a {@link REXPString}.
 	 */
-	public String evalReturnString(String expr) throws RInterfaceException {
+	public String evalReturnString(String expr) throws RFaceException {
 		String[] strs = evalReturnStrings(expr);
 
 		if (strs == null) {
@@ -391,10 +391,10 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to try and parse and eval
 	 * @return rlist, or {@code null} if expr returns REXPNull.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if {@code expr} does not return a list
 	 */
-	public RList parseEvalTryAsRList(String expr) throws RInterfaceException {
+	public RList parseEvalTryAsRList(String expr) throws RFaceException {
 		REXP rexp = parseEvalTry(expr);
 
 		if (rexp instanceof REXPNull) {
@@ -402,14 +402,14 @@ public final class RInterfaceHL {
 
 		}
 		if (!rexp.isList()) {
-			throw new RInterfaceException(expr + " returned "
+			throw new RFaceException(expr + " returned "
 					+ rexp.getClass().getCanonicalName() + " instead of a list");
 		}
 
 		try {
 			return rexp.asList();
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 
 	}
@@ -422,11 +422,11 @@ public final class RInterfaceHL {
 	 * @param expr
 	 *            expression to try and parse and eval
 	 * @return REXP result of the evaluation.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if there is a parse or evaluation error the error message is
 	 *             returned in the exception. Nothing printed to the console.
 	 */
-	public REXP parseEvalTry(String expr) throws RInterfaceException {
+	public REXP parseEvalTry(String expr) throws RFaceException {
 		if (!initialized()) {
 			throw new IllegalStateException("REngine has not been initialized.");
 		}
@@ -463,7 +463,7 @@ public final class RInterfaceHL {
 			} else if (rexp.inherits("try-error")) {
 				// evaluated with error and returned "try-error" object which
 				// contains error message
-				throw new RInterfaceException(rexp.asString());
+				throw new RFaceException(rexp.asString());
 			} else {
 				// evaluated OK and returned object
 				return rexp;
@@ -471,10 +471,10 @@ public final class RInterfaceHL {
 
 		} catch (REngineException e) {
 			// catch any errors generated by parseAndEval and display msg
-			throw new RInterfaceException(exprErrMsg(expr), e);
+			throw new RFaceException(exprErrMsg(expr), e);
 		} catch (REXPMismatchException e) {
 			// catch any errors generated by parseAndEval and display msg
-			throw new RInterfaceException(exprErrMsg(expr) + e.getMessage(), e);
+			throw new RFaceException(exprErrMsg(expr) + e.getMessage(), e);
 		}
 	}
 
@@ -500,25 +500,25 @@ public final class RInterfaceHL {
 	public String getErrMessage() {
 		try {
 			return evalReturnString("geterrmessage()");
-		} catch (RInterfaceException e) {
+		} catch (RFaceException e) {
 			return "geterrmessage failed!";
 		}
 	}
 
 	/**
 	 * Evaluate {@code expr} returning a {@link RMatrix} or any errors as an
-	 * {@link RInterfaceException}.
+	 * {@link RFaceException}.
 	 * 
 	 * @param expr
 	 *            expression
 	 * @return {@link RMatrix}
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem evaluating {@code expr}, including if {@code expr}
 	 *             does not return an expression that can be represented as a
 	 *             {@link RMatrix}.
 	 */
 	public RMatrix parseEvalTryReturnRMatrix(String expr)
-			throws RInterfaceException {
+			throws RFaceException {
 		REXP rexp = parseEvalTry(expr);
 		return new RMatrix(expr, rexp);
 	}
@@ -586,8 +586,8 @@ public final class RInterfaceHL {
 	public REXP parseEvalTry(File file) throws IOException {
 		try {
 			return parseEvalTry(RUtil.readRFile(file));
-		} catch (RInterfaceException e) {
-			throw new RInterfaceException(file.getCanonicalPath() + " "
+		} catch (RFaceException e) {
+			throw new RFaceException(file.getCanonicalPath() + " "
 					+ e.getMessage(), e);
 		}
 	}
@@ -606,10 +606,10 @@ public final class RInterfaceHL {
 	 * 
 	 * @param msg
 	 *            message to print.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during evaluation.
 	 */
-	public void printToConsole(String msg) throws RInterfaceException {
+	public void printToConsole(String msg) throws RFaceException {
 		rloopHandler.rWriteConsole(null, msg, 0);
 		// parseAndEval("cat('" + msg + "')");
 	}
@@ -619,10 +619,10 @@ public final class RInterfaceHL {
 	 * 
 	 * @param msg
 	 *            message to print.
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during evaluation.
 	 */
-	public void printlnToConsole(String msg) throws RInterfaceException {
+	public void printlnToConsole(String msg) throws RFaceException {
 		printToConsole(msg + "\n");
 	}
 
@@ -634,16 +634,16 @@ public final class RInterfaceHL {
 	 *            symbol name
 	 * @param rexp
 	 *            r expression
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem assigning
 	 */
-	public void assign(String name, REXP rexp) throws RInterfaceException {
+	public void assign(String name, REXP rexp) throws RFaceException {
 		try {
 			rosudaEngine.assign(name, rexp);
 		} catch (REngineException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 	}
 
@@ -654,11 +654,11 @@ public final class RInterfaceHL {
 	 *            the name of the dataframe to create in R.
 	 * @param rlist
 	 *            the rlist
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem assigning list
 	 */
 	public void assignDataFrame(String name, RList rlist)
-			throws RInterfaceException {
+			throws RFaceException {
 		try {
 			// turn the rlist into a dataframe
 			REXP dataframe = REXP.createDataFrame(rlist);
@@ -666,7 +666,7 @@ public final class RInterfaceHL {
 			// assign the dataframe to a named R object
 			assign(name, dataframe);
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 	}
 
@@ -678,11 +678,11 @@ public final class RInterfaceHL {
 	 *            name of hash
 	 * @param map
 	 *            map to write out as hash
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem creating hash
 	 */
 	public void assignHash(String name, Map<String, ?> map)
-			throws RInterfaceException {
+			throws RFaceException {
 
 		// create new hash
 		parseEvalTry(name + " <- hash()");
@@ -702,10 +702,10 @@ public final class RInterfaceHL {
 	 * Get R_DEFAULT_PACKAGES.
 	 * 
 	 * @return default packages
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem during command evaluation.
 	 */
-	public String getCurrentPackages() throws RInterfaceException {
+	public String getCurrentPackages() throws RFaceException {
 
 		REXP availablePkgs;
 		try {
@@ -716,7 +716,7 @@ public final class RInterfaceHL {
 				return ArrayUtil.toString(availablePkgs.asStrings());
 			}
 		} catch (REXPMismatchException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 	}
 
@@ -725,10 +725,10 @@ public final class RInterfaceHL {
 	 * 
 	 * @param pack
 	 *            package name
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem loading package.
 	 */
-	public void loadPackage(String pack) throws RInterfaceException {
+	public void loadPackage(String pack) throws RFaceException {
 		String packages = getCurrentPackages();
 		if (!packages.contains(pack)) {
 			printlnToConsole("Package " + pack
@@ -772,10 +772,10 @@ public final class RInterfaceHL {
 	 * Get the working directory.
 	 * 
 	 * @return working directory
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if probleming reading directory
 	 */
-	public String getWd() throws RInterfaceException {
+	public String getWd() throws RFaceException {
 		return evalReturnString("getwd()");
 	}
 
@@ -785,10 +785,10 @@ public final class RInterfaceHL {
 	 * 
 	 * @param dir
 	 *            working directory
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem setting directory
 	 */
-	public void setWd(String dir) throws RInterfaceException {
+	public void setWd(String dir) throws RFaceException {
 		parseEvalTry("setwd(\"" + sanitiseFilePath(dir) + "\")");
 	}
 }

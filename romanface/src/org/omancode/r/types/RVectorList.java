@@ -3,7 +3,9 @@ package org.omancode.r.types;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.casper.data.model.CDataCacheContainer;
 import net.casper.data.model.CDataGridException;
@@ -13,7 +15,7 @@ import net.casper.data.model.CRowMetaData;
 import net.casper.ext.CMarkedUpRowBean;
 import net.casper.ext.swing.CDataRuntimeException;
 
-import org.omancode.r.RInterfaceException;
+import org.omancode.r.RFaceException;
 import org.omancode.util.beans.BeanPropertyInspector;
 import org.omancode.util.beans.BeanUtil;
 import org.rosuda.REngine.REXP;
@@ -22,15 +24,16 @@ import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.RList;
 
 /**
- * A list of {@link RVector)s. Can be created from POJO collections, an
- * {@link RList} or Casper dataset. Can return an {@link RList} representation.
+ * A list of {@link RVector)s. Can be created from POJO collections, an {
+ * @link RList} or Casper dataset. Provides method to convert to an
+ * {@link RList} for use with R.
  * 
  * Used to represent POJO collections or Casper datasets in R.
  * 
  * @author Oliver Mannion
  * @version $Revision$
  */
-public class RVectors {
+public class RVectorList implements List<RVector> {
 
 	private final List<RVector> vectors;
 
@@ -55,12 +58,12 @@ public class RVectors {
 	 * @throws IntrospectionException
 	 *             if problem reading properties of the collection
 	 */
-	public RVectors(Collection<?> col, Class<?> stopClass)
+	public RVectorList(Collection<?> col, Class<?> stopClass)
 			throws IntrospectionException {
 		this(col, new BeanPropertyInspector(col.iterator().next(), stopClass));
 	}
 
-	private RVectors(Collection<?> col, BeanPropertyInspector props)
+	private RVectorList(Collection<?> col, BeanPropertyInspector props)
 			throws IntrospectionException {
 
 		// create a empty list of RVectors from the properties
@@ -86,10 +89,11 @@ public class RVectors {
 	 * 
 	 * @param container
 	 *            casper container
-	 * @throws RInterfaceException
+	 * @throws RFaceException
 	 *             if problem
 	 */
-	public RVectors(CDataCacheContainer container) throws RInterfaceException {
+	public RVectorList(CDataCacheContainer container)
+			throws RFaceException {
 		// create an RVector for each column
 		this(container.getMetaDefinition().getColumnNames(), container
 				.getMetaDefinition().getColumnTypes(), container.size());
@@ -106,7 +110,7 @@ public class RVectors {
 				}
 			}
 		} catch (CDataGridException e) {
-			throw new RInterfaceException(e);
+			throw new RFaceException(e);
 		}
 	}
 
@@ -124,7 +128,7 @@ public class RVectors {
 	 * @param numElements
 	 *            initial size of each vector
 	 */
-	public RVectors(List<String> names, List<Class<?>> types, int numElements) {
+	public RVectorList(List<String> names, List<Class<?>> types, int numElements) {
 		this(names.toArray(new String[names.size()]), types
 				.toArray(new Class<?>[names.size()]), numElements);
 	}
@@ -143,7 +147,7 @@ public class RVectors {
 	 * @param numElements
 	 *            initial size of each vector
 	 */
-	public RVectors(String[] names, Class<?>[] types, int numElements) {
+	public RVectorList(String[] names, Class<?>[] types, int numElements) {
 		vectors = createEmptyVectors(names, types, numElements);
 	}
 
@@ -193,7 +197,7 @@ public class RVectors {
 	 *             if problem determining {@code dimnames} attribute, or reading
 	 *             a {@link REXP} in the {@link RList}.
 	 */
-	public RVectors(RList rlist) throws UnsupportedTypeException,
+	public RVectorList(RList rlist) throws UnsupportedTypeException,
 			REXPMismatchException {
 		vectors = new ArrayList<RVector>(rlist.size());
 
@@ -214,18 +218,19 @@ public class RVectors {
 
 	/**
 	 * Add the columns in a {@link CMarkedUpRow} as vectors to this
-	 * {@link RVectors}. The additional columns/vectors are filled by the
+	 * {@link RVectorList}. The additional columns/vectors are filled by the
 	 * {@link CMarkedUpRow}s retrieved from a collection of
 	 * {@link CMarkedUpRowBean}s.
 	 * 
 	 * @param col
 	 *            collection of beans that expose a {@link CMarkedUpRow}.
-	 * @return this {@link RVectors}. Will now contain the added
+	 * @return this {@link RVectorList}. Will now contain the added
 	 *         columns/vectors.
 	 * @throws IntrospectionException
 	 *             if problem reading collection.
 	 */
-	public RVectors addCMarkedUpRow(Collection<? extends CMarkedUpRowBean> col)
+	public RVectorList addCMarkedUpRow(
+			Collection<? extends CMarkedUpRowBean> col)
 			throws IntrospectionException {
 
 		if (col.size() != vectors.get(0).size()) {
@@ -267,20 +272,151 @@ public class RVectors {
 	 * Return a new {@link RList} from this list of {@link RVector}s.
 	 * 
 	 * @return rlist rlist
-	 * @throws RInterfaceException
-	 *             if problem
+	 * @throws RFaceException
+	 *             if vectors cannot be converted to {@link REXPVector}s.
 	 */
-	public RList asRList() throws RInterfaceException {
+	public RList asRList() throws RFaceException {
 		// create an rlist of REXPVectors from each RVector
 		RList rlist = new RList(vectors.size(), true);
 		for (RVector vector : vectors) {
 			try {
 				rlist.put(vector.getName(), vector.getREXPVector());
 			} catch (UnsupportedTypeException e) {
-				throw new RInterfaceException("Cannot get R vector ["
+				throw new RFaceException("Cannot get R vector ["
 						+ vector.getName() + "]. " + e.getMessage(), e);
 			}
 		}
 		return rlist;
+	}
+
+	/**
+	 * Return a new R dataframe from this list of {@link RVector}s.
+	 * 
+	 * @return rlist rlist
+	 * @throws RFaceException
+	 *             if vectors are empty or cannot be converted to
+	 *             {@link REXPVector}s.
+	 */
+	public REXP asDataFrame() throws RFaceException {
+		try {
+			return REXP.createDataFrame(asRList());
+		} catch (REXPMismatchException e) {
+			throw new RFaceException(e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public int size() {
+		return vectors.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return vectors.isEmpty();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return vectors.contains(o);
+	}
+
+	@Override
+	public Iterator<RVector> iterator() {
+		return vectors.iterator();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return vectors.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return vectors.toArray(a);
+	}
+
+	@Override
+	public boolean add(RVector e) {
+		return vectors.add(e);
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return vectors.remove(o);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return vectors.containsAll(c);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends RVector> c) {
+		return vectors.addAll(c);
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends RVector> c) {
+		return vectors.addAll(index, c);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return vectors.removeAll(c);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return vectors.retainAll(c);
+	}
+
+	@Override
+	public void clear() {
+		vectors.clear();
+	}
+
+	@Override
+	public RVector get(int index) {
+		return vectors.get(index);
+	}
+
+	@Override
+	public RVector set(int index, RVector element) {
+		return vectors.set(index, element);
+	}
+
+	@Override
+	public void add(int index, RVector element) {
+		vectors.add(index, element);
+	}
+
+	@Override
+	public RVector remove(int index) {
+		return vectors.remove(index);
+	}
+
+	@Override
+	public int indexOf(Object o) {
+		return vectors.indexOf(o);
+	}
+
+	@Override
+	public int lastIndexOf(Object o) {
+		return vectors.lastIndexOf(o);
+	}
+
+	@Override
+	public ListIterator<RVector> listIterator() {
+		return vectors.listIterator();
+	}
+
+	@Override
+	public ListIterator<RVector> listIterator(int index) {
+		return vectors.listIterator(index);
+	}
+
+	@Override
+	public List<RVector> subList(int fromIndex, int toIndex) {
+		return vectors.subList(fromIndex, toIndex);
 	}
 }
