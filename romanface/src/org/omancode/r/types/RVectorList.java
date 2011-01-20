@@ -10,10 +10,10 @@ import java.util.ListIterator;
 import net.casper.data.model.CDataCacheContainer;
 import net.casper.data.model.CDataGridException;
 import net.casper.data.model.CDataRowSet;
+import net.casper.data.model.CDataRuntimeException;
 import net.casper.data.model.CMarkedUpRow;
+import net.casper.data.model.CMarkedUpRowBean;
 import net.casper.data.model.CRowMetaData;
-import net.casper.ext.CMarkedUpRowBean;
-import net.casper.ext.swing.CDataRuntimeException;
 
 import org.omancode.r.RFaceException;
 import org.omancode.util.beans.BeanPropertyInspector;

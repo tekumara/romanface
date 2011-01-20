@@ -20,6 +20,7 @@
 	</publications>
 
 	<dependencies>
+		<dependency org="net.casper" name="casperdatasets" rev="latest.integration" conf="*->@"/>
 		<dependency org="org.omancode" name="omcutil" rev="latest.integration" conf="*->@"/>
 		<dependency org="org.omancode" name="readmytables" rev="latest.integration" conf="*->@"/>
         <dependency org="commons-lang" name="commons-lang" rev="latest.integration" conf="*->@"/>
