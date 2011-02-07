@@ -24,8 +24,8 @@ import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.RList;
 
 /**
- * A list of {@link RVector)s. Can be created from POJO collections, an {
- * @link RList} or Casper dataset. Provides method to convert to an
+ * A list of {@link RVector}s. Can be created from POJO collections, an
+ * {@link RList} or Casper dataset. Provides method to convert to an
  * {@link RList} for use with R.
  * 
  * Used to represent POJO collections or Casper datasets in R.
@@ -92,8 +92,7 @@ public class RVectorList implements List<RVector> {
 	 * @throws RFaceException
 	 *             if problem
 	 */
-	public RVectorList(CDataCacheContainer container)
-			throws RFaceException {
+	public RVectorList(CDataCacheContainer container) throws RFaceException {
 		// create an RVector for each column
 		this(container.getMetaDefinition().getColumnNames(), container
 				.getMetaDefinition().getColumnTypes(), container.size());

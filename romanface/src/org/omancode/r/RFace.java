@@ -13,7 +13,6 @@ import org.omancode.r.types.REXPUtil;
 import org.omancode.r.types.RMatrix;
 import org.omancode.util.ArrayUtil;
 import org.rosuda.JRI.RMainLoopCallbacks;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPNull;
@@ -38,7 +37,7 @@ import org.rosuda.REngine.JRI.JRIEngine;
  * 
  * Uses the RServe {@link REngine} interface, which prevents re-entrance and has
  * Java side objects that represent R data structures, rather than the lower
- * level JRI {@link Rengine} interface which doesn't have these features.
+ * level JRI {@link org.rosuda.JRI.Rengine} interface which doesn't have these features.
  * 
  * @author Oliver Mannion
  * @version $Revision$

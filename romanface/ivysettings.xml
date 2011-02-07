@@ -4,6 +4,6 @@
 	<!-- default, i.e use local, shared and public resolvers -->
 	<settings defaultResolver="default" />
 
-	<!-- make build.properites available for ivy.xml -->
+	<!-- make build.properites available for ivy.xml  -->
 	<properties file="build.properties" />
 </ivysettings>

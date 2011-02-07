@@ -254,7 +254,7 @@ public class RSwingConsole extends JComponent implements RMainLoopCallbacks {
 				new FileDialog(new Frame(), newFile == 0 ? "Select a file"
 						: "Select a new file", newFile == 0 ? FileDialog.LOAD
 						: FileDialog.SAVE);
-		fd.show();
+		fd.setVisible(true);
 		String res = null;
 		if (fd.getDirectory() != null) {
 			res = fd.getDirectory();

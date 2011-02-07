@@ -1,0 +1,31 @@
+<html>
+<body>
+
+<p>A high level R interface for Java that extends <a href="http://www.rforge.net/org/docs/org/rosuda/REngine/REngine.html">org.rosuda.REngine.REngine</a> of the <a href="http://www.rforge.net/Rserve/">Rserve project</a>. 
+</p>
+<p>
+Includes 
+</p>
+<ul>
+<li>Single instance static interface to R (because R is single threaded) that includes: </li>
+<ul>
+<li>Load and initialise functions.  </li>
+<li>Multiple methods for evaluating R expressions including with/without output of returned expressions or printed output, and with/without exception handling.  </li>
+<li>Evaluation of expressions from files.  </li>
+<li>Assignment of R objects.  </li>
+<li>Message output to the R console.  </li>
+</ul>
+<li>Java object representations of R matrices, dataframes, and vectors. </li>
+<ul>
+<li>Conversion of Java bean collections and <a href="http://code.google.com/p/casperdatasets/">Casper datasets</a> to R dataframes </li>
+<li>Conversion of R dataframes, matrices and vectors to <a href="http://code.google.com/p/casperdatasets/">Casper datasets</a> </li>
+</ul>
+<li>GUI elements including: </li>
+<ul>
+<li>A Swing console with a command history </li>
+<li>A JTree representing objects in the R environment </li>
+<li>A interface for UIs that gather input from the user and execute an R command. </li>
+</ul>
+</ul>
+</body>
+</html>
