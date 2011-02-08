@@ -12,8 +12,8 @@
 	<property name="javac.debug" value="on" />
 	<property name="javac.args" value="-Xlint" />
 
-	<!-- locations -->
-	<property name="ant.extras.dir" location="build/ant.extras" />
+	<!-- locations NB: relative paths are relative to importer -->
+	<dirname property="ant.extras.dir" file="${ant.file.common}" />
 	<property name="src.dir" location="src" />
 	<property name="res.dir" value="resource" />
 	<property name="build.dir" location="build" />
