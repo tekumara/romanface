@@ -2,11 +2,11 @@
 <project name="romanface" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- import common build tasks -->
-	<import file="build/build.common.xml" />
+	<import file="buildsupport/build.common.xml" />
 	
 	<!-- project specific javadoc properties -->
 	<presetdef name="javadoc-with-presets">
-		<javadoc overview="../overview.html">
+		<javadoc overview="overview.html">
 			<link href="http://java.sun.com/javase/6/docs/api/" />
 			<link href="http://www.rforge.net/org/docs/" />
 			<link href="http://casperdatasets.googlecode.com/svn/trunk/casperdatasets/documents/javadoc/" />
