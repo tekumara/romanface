@@ -13,7 +13,8 @@
 	<property name="javac.args" value="-Xlint" />
 
 	<!-- locations NB: relative paths are relative to importer -->
-	<dirname property="ant.extras.dir" file="${ant.file.common}" />
+	<dirname property="buildsupport.dir" file="${ant.file.common}" />
+	<ivy:settings file="${buildsupport.dir}/ivysettings.xml" />
 	<property name="src.dir" location="src" />
 	<property name="res.dir" value="resource" />
 	<property name="build.dir" location="build" />
@@ -99,7 +100,7 @@
 		<ivy:publish artifactspattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]" status="release" overwrite="true" resolver="local" />
 	</target>
 
-	<taskdef name="gcupload" classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="${ant.extras.dir}/ant-googlecode-0.0.2.jar" />
+	<taskdef name="gcupload" classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="${buildsupport.dir}/ant-googlecode-0.0.2.jar" />
 	<target name="gcupload" description="Upload JARs to googlecode">
 		<property file="build.credentials.properties" />
 

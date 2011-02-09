@@ -26,17 +26,17 @@
 		<ivy:artifactproperty name="[artifact]-rev" 
 		       value="[artifact]-[revision]"/>
 		
-		<property name="optimsed.jar" value="${fastutil-rev}-${name}-optimised.jar" />
+		<property name="optimised.jar" value="${fastutil-rev}-${name}-optimised.jar" />
 		
 		<echo level="info" message="Creating ${optimsed.jar}" />
 	
 		<!-- create jar with only needed classes & their dependents -->
 		<taskdef name="jaropt" 
 			classname="org.cmc.jaroptimizer.JarOptTask" 
-			classpath="${ant.extras.dir}/jaropt-0.77.jar" />
+			classpath="${buildsupport.dir}/jaropt-0.77.jar" />
 		
 		<jaropt src="${fastutil-lib}" 
-			dst="${ivy.lib.dir}/${optimsed.jar}" 
+			dst="${ivy.lib.dir}/${optimised.jar}" 
 			verbose="false" 
 			printDependencies="false">
 				<includePattern>it.unimi.dsi.fastutil.booleans.BooleanArrayList</includePattern>
