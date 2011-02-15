@@ -14,6 +14,13 @@
 		</javadoc>
 	</presetdef>
 
+	<!-- project specific manifest properties -->
+	<presetdef name="manifest-with-presets">
+		<manifest>
+			<attribute name="Main-Class" value="org.omancode.r.ui.RSwingConsoleExample"/>
+		</manifest>
+	</presetdef>
+		
 	<target name="post-resolve" depends="resolve" description="Optimise fastutil jars">
 	
 		<!-- save the retrieved location of each artifact to the property 

@@ -127,7 +127,8 @@ public class RVectorList implements List<RVector> {
 	 * @param numElements
 	 *            initial size of each vector
 	 */
-	public RVectorList(List<String> names, List<Class<?>> types, int numElements) {
+	public RVectorList(List<String> names, List<Class<?>> types,
+			int numElements) {
 		this(names.toArray(new String[names.size()]), types
 				.toArray(new Class<?>[names.size()]), numElements);
 	}
@@ -206,7 +207,8 @@ public class RVectorList implements List<RVector> {
 			if (element instanceof REXPVector) {
 				REXPVector rexp = (REXPVector) element;
 
-				vectors.add(new RVector((String) rlist.names.get(index++), rexp));
+				vectors.add(new RVector((String) rlist.names.get(index++),
+						rexp));
 			} else {
 				throw new UnsupportedTypeException("rlist contains "
 						+ element.getClass().getCanonicalName());
@@ -220,6 +222,9 @@ public class RVectorList implements List<RVector> {
 	 * {@link RVectorList}. The additional columns/vectors are filled by the
 	 * {@link CMarkedUpRow}s retrieved from a collection of
 	 * {@link CMarkedUpRowBean}s.
+	 * 
+	 * If a {@link CMarkedUpRow} is not returned by the first
+	 * {@link CMarkedUpRowBean} then this method will silently exit.
 	 * 
 	 * @param col
 	 *            collection of beans that expose a {@link CMarkedUpRow}.
@@ -241,11 +246,17 @@ public class RVectorList implements List<RVector> {
 		CMarkedUpRowBean cMarkedUpRowBean = col.iterator().next();
 		CMarkedUpRow firstRow = cMarkedUpRowBean.getMarkedUpRow();
 
+		if (firstRow == null) {
+			// exit silently
+			return this;
+		}
+
 		// get list of vectors, one for each column in the row
 		// the vectors will be empty
 		CRowMetaData meta = firstRow.getMetaDefinition();
-		List<RVector> rowVectors = createEmptyVectors(meta.getColumnNames(),
-				meta.getColumnTypes(), col.size());
+		List<RVector> rowVectors =
+				createEmptyVectors(meta.getColumnNames(),
+						meta.getColumnTypes(), col.size());
 
 		// fill the RVectors' values row by row
 		// from the bean's property values

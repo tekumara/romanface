@@ -13,7 +13,7 @@
 	<dirname property="buildsupport.dir" file="${ant.file.common}" />
 	<ivy:settings file="${buildsupport.dir}/ivysettings.xml" />
 	<property name="src.dir" location="src" />
-	<property name="res.dir" location="resource" />
+	<property name="res.dir" value="resource" />
 	<property name="build.dir" location="build" />
 	<property name="dist.dir" location="${build.dir}" />
 	<property name="ivy.lib.dir" location="${build.dir}/lib" />
@@ -35,13 +35,17 @@
 		</fileset>
 	</path>
 
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+	</tstamp>
+
 	<target name="resolve" description="Resolve dependencies using Ivy">
 		<!-- do a retrieve to ivy.lib.dir -->
-		<ivy:retrieve conf="master" />
+		<ivy:retrieve conf="default" />
 
 		<!-- save report to doc.dir -->
-		<ivy:report conf="master" graph="false" todir="${ivyreport.dir}" />
-		
+		<ivy:report conf="default" graph="false" todir="${ivyreport.dir}" />
+
 	</target>
 	
 	<target name="post-resolve" depends="resolve" description="Post Ivy resolve" />
@@ -53,14 +57,19 @@
 	<target name="init" depends="clean" description="Create compilation dirs">
 		<mkdir dir="${class.dir}" />
 		<copy includeemptydirs="false" failonerror="false" todir="${class.dir}">
-			<!-- place resources in root dir of jar so they'll be on the classpath -->
-			<fileset dir="${res.dir}/" />
 			<fileset dir="${src.dir}">
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
+			<!-- replace @VERSION@ token with version number -->
+			<filterset>
+				<filter token="VERSION" value="${version}"/>
+			</filterset>
 		</copy>
-
+		<!-- place resources in root dir of jar so they'll be on the classpath -->
+		<copy includeemptydirs="false" flatten="true" todir="${class.dir}">
+			<fileset dir="." includes="${res.dir}/" />
+		</copy>
 	</target>
 
 	<target name="clean" description="Remove build dir">
@@ -79,13 +88,30 @@
 
 	<target name="package" depends="compile, javadoc" description="Package JAR files">
 		<mkdir dir="${dist.dir}" />
-		<jar destfile="${dist.dir}/${binary.jar}" basedir="${class.dir}" />
+		<property name="manifest" location="${dist.dir}/MANIFEST.MF" />
+		
+		<manifestclasspath property="jar.classpath"
+				jarfile="${dist.dir}/${binary.jar}">
+			<classpath refid="build.classpath" />
+		</manifestclasspath>
+
+		<manifest-with-presets file="${manifest}" mode="replace">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Implementation-Version" value="${version}"/>
+			<attribute name="Built-Date" value="${TODAY}"/>
+			<attribute name="Class-Path" value="${jar.classpath}" />
+		</manifest-with-presets>
+	
+		<jar destfile="${dist.dir}/${binary.jar}" basedir="${class.dir}"
+			manifest="${manifest}" />
 		<jar destfile="${dist.dir}/${javadoc.jar}" basedir="${doc.dir}" />
 		<jar destfile="${dist.dir}/${sources.jar}" basedir="${src.dir}" />
 		<zip destfile="${dist.dir}/${binary.plus.deps.zip}" basedir="${dist.dir}">
 			<include name="*.jar" />
 			<zipfileset dir="${ivy.lib.dir}" prefix="lib" />
 		</zip>
+		
+		<delete file="${manifest}" />
 	</target>
 
 	<target name="publish" description="Publish JARs to local ivy repository">

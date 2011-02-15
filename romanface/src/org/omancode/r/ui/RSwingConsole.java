@@ -16,7 +16,8 @@ import org.rosuda.JRI.Rengine;
 import bsh.util.JConsole;
 
 /**
- * Swing GUI Console that interacts with the main R REPL (Read-eval-print loop).
+ * Swing GUI Console with command history. Interfaces with the main R REPL
+ * (Read-eval-print loop).
  * 
  * @author Oliver Mannion
  * @version $Revision$
@@ -31,16 +32,16 @@ public class RSwingConsole extends JComponent implements RMainLoopCallbacks {
 	/**
 	 * Default font for console : Monospaced plain 12 pt.
 	 */
-	public static final Font DEFAULT_FONT =
-			new Font("Monospaced", Font.PLAIN, 12);
+	public static final Font DEFAULT_FONT = new Font("Monospaced",
+			Font.PLAIN, 12);
 
-	private static final String LINESEP =
-			System.getProperty("line.separator");
+	private static final String LINESEP = System
+			.getProperty("line.separator");
 
 	private final JConsole console = new JConsole();
 
-	private final BufferedReader keyboard =
-			new BufferedReader(console.getIn());
+	private final BufferedReader keyboard = new BufferedReader(
+			console.getIn());
 
 	private boolean promptVisible = false;
 
@@ -165,7 +166,7 @@ public class RSwingConsole extends JComponent implements RMainLoopCallbacks {
 	}
 
 	/**
-	 * Make the prompt visible and display it immediately. 
+	 * Make the prompt visible and display it immediately.
 	 */
 	public void printPrompt() {
 		if (!promptVisible) {
@@ -189,14 +190,14 @@ public class RSwingConsole extends JComponent implements RMainLoopCallbacks {
 	 * events and will appear frozen while this method waits for and/or
 	 * processes input.
 	 * 
-	 *@param re
+	 * @param re
 	 *            calling engine
-	 *@param prompt
+	 * @param prompt
 	 *            prompt to be displayed at the console prior to user's input
-	 *@param addToHistory
+	 * @param addToHistory
 	 *            flag telling the handler whether the input should be
 	 *            considered for adding to history (!=0) or not (0)
-	 *@return user's input to be passed to R for evaluation
+	 * @return user's input to be passed to R for evaluation
 	 */
 	@Override
 	public String rReadConsole(Rengine re, String prompt, int addToHistory) {
