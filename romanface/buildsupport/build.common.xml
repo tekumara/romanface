@@ -7,7 +7,7 @@
 	<property name="target" value="1.6" />
 	<property name="source" value="1.6" />
 	<property name="javac.debug" value="on" />
-	<property name="javac.args" value="-Xlint" />
+	<property name="javac.args" value="-Xlint -Xlint:-path" />
 
 	<!-- locations NB: relative paths are relative to importer -->
 	<dirname property="buildsupport.dir" file="${ant.file.common}" />
