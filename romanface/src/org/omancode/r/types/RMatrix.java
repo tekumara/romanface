@@ -95,21 +95,24 @@ public class RMatrix implements CBuilder {
 	 */
 	public RMatrix(String name, REXP rexp) throws RFaceException {
 		if (!RMatrix.isMatrix(rexp)) {
-			throw new RFaceException(rexp,
-					"Cannot be accessed as a RMatrix");
+			throw new RFaceException(rexp, "Cannot be accessed as a RMatrix");
 		}
 
 		// get names of the dimensions (dimnames)
 		String[] namesDimNames = REXPAttr.getNamesDimNames(rexp);
-		rowVariableName = (namesDimNames == null) ? ""
-				: namesDimNames[0]
-						+ (!("".equals(namesDimNames[0]) || ""
-								.equals(namesDimNames[1])) ? " / " : "")
-						+ namesDimNames[1];
-		String colVariableName = (namesDimNames == null) ? ""
-				: namesDimNames[1];
-		this.name = (name == null) ? rowVariableName + " by " + colVariableName
-				: name;
+		rowVariableName =
+				(namesDimNames == null) ? ""
+						: namesDimNames[0]
+								+ (!("".equals(namesDimNames[0])
+										|| "".equals(namesDimNames[1]) || (namesDimNames[1] == null)) ? " / "
+										: "")
+								+ ((namesDimNames[1] != null) ? namesDimNames[1]
+										: "");
+		String colVariableName =
+				(namesDimNames == null) ? "" : namesDimNames[1];
+		this.name =
+				(name == null) ? rowVariableName + " by " + colVariableName
+						: name;
 
 		try {
 			// get rowNames & colNames from the dimnames attribute
@@ -187,11 +190,11 @@ public class RMatrix implements CBuilder {
 
 			// narrow the row names so that if they are numbers,
 			// they will be number sorted not string sorted
-			Class<?> rowNamesType = NarrowUtil.calcNarrowestType(rowNames,
-					false);
+			Class<?> rowNamesType =
+					NarrowUtil.calcNarrowestType(rowNames, false);
 			try {
-				rowNames = NarrowUtil
-						.narrowArray(rowNames, rowNamesType, false);
+				rowNames =
+						NarrowUtil.narrowArray(rowNames, rowNamesType, false);
 			} catch (NarrowException e) {
 				throw new IllegalStateException(e);
 			}
@@ -218,11 +221,7 @@ public class RMatrix implements CBuilder {
 
 	@Override
 	public String[] getPrimaryKeyColumns() {
-		if (rowNames == null) {
-			return null;
-		} else {
-			return new String[] { rowVariableName };
-		}
+		return null;
 	}
 
 	@Override

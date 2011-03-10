@@ -37,7 +37,8 @@ import org.rosuda.REngine.JRI.JRIEngine;
  * 
  * Uses the RServe {@link REngine} interface, which prevents re-entrance and has
  * Java side objects that represent R data structures, rather than the lower
- * level JRI {@link org.rosuda.JRI.Rengine} interface which doesn't have these features.
+ * level JRI {@link org.rosuda.JRI.Rengine} interface which doesn't have these
+ * features.
  * 
  * @author Oliver Mannion
  * @version $Revision$
@@ -53,7 +54,8 @@ public final class RFace {
 	/**
 	 * Newline.
 	 */
-	private static final String NEWLINE = System.getProperty("line.separator");
+	private static final String NEWLINE = System
+			.getProperty("line.separator");
 
 	/**
 	 * Private constructor prevents instantiation from other classes.
@@ -153,8 +155,7 @@ public final class RFace {
 	 *             if R cannot be loaded.
 	 * @throws RFaceException
 	 */
-	private RFace(RMainLoopCallbacks rloopHandler)
-			throws RFaceException {
+	private RFace(RMainLoopCallbacks rloopHandler) throws RFaceException {
 
 		// tell Rengine code not to die if it can't
 		// load the JRI native DLLs. This allows
@@ -167,8 +168,8 @@ public final class RFace {
 			// ends up loading jri.dll via a System.loadLibrary("jri") call
 			// in org.rosuda.JRI.Rengine
 			// which looks in java.library.path for jri.dll
-			rosudaEngine = new JRIEngine(new String[] { "--no-save" },
-					rloopHandler);
+			rosudaEngine =
+					new JRIEngine(new String[] { "--no-save" }, rloopHandler);
 
 		} catch (REngineException e) {
 
@@ -176,8 +177,8 @@ public final class RFace {
 			System.err.format("%s=%s%n", "java.library.path",
 					System.getProperty("java.library.path"));
 			System.err.format("%s=%s%n", "Path", System.getenv().get("Path"));
-			System.err.format("%s=%s%n", "R_HOME", System.getenv()
-					.get("R_HOME"));
+			System.err.format("%s=%s%n", "R_HOME",
+					System.getenv().get("R_HOME"));
 
 			throw new RFaceException(e.getMessage(), e);
 		}
@@ -221,7 +222,8 @@ public final class RFace {
 	 */
 	public REXP eval(String expr) throws RFaceException {
 		if (!initialized()) {
-			throw new IllegalStateException("REngine has not been initialized.");
+			throw new IllegalStateException(
+					"REngine has not been initialized.");
 		}
 
 		try {
@@ -287,7 +289,8 @@ public final class RFace {
 	 */
 	public Map<String, String> evalReturnNamedStrings(String expr)
 			throws RFaceException {
-		Map<String, String> namedStrings = new LinkedHashMap<String, String>();
+		Map<String, String> namedStrings =
+				new LinkedHashMap<String, String>();
 
 		return evalReturnNamedStrings(expr, namedStrings);
 
@@ -402,7 +405,8 @@ public final class RFace {
 		}
 		if (!rexp.isList()) {
 			throw new RFaceException(expr + " returned "
-					+ rexp.getClass().getCanonicalName() + " instead of a list");
+					+ rexp.getClass().getCanonicalName()
+					+ " instead of a list");
 		}
 
 		try {
@@ -427,7 +431,8 @@ public final class RFace {
 	 */
 	public REXP parseEvalTry(String expr) throws RFaceException {
 		if (!initialized()) {
-			throw new IllegalStateException("REngine has not been initialized.");
+			throw new IllegalStateException(
+					"REngine has not been initialized.");
 		}
 
 		try {
@@ -529,6 +534,16 @@ public final class RFace {
 	 * doesn't produce Java exceptions for expression errors. Uses R global
 	 * environment.
 	 * 
+	 * Since the complete expression is parsed before any of it is run, syntax
+	 * errors result in none of the code being run. If an error occurs in
+	 * running a syntactically correct expression, execution will stop and the
+	 * rest of the expression will not be executed. Anything assigned into the
+	 * workspace by code that has been run will be kept (just as from the
+	 * command line).
+	 * 
+	 * traceback() does not work on expressions evaluted by
+	 * {@link #parseEvalPrint(String)}.
+	 * 
 	 * @param expr
 	 *            expression to parse, eval and show
 	 * @return REXP result of the evaluation. Also printed to the console if
@@ -537,7 +552,8 @@ public final class RFace {
 	 */
 	public REXP parseEvalPrint(String expr) {
 		if (!initialized()) {
-			throw new IllegalStateException("REngine has not been initialized.");
+			throw new IllegalStateException(
+					"REngine has not been initialized.");
 		}
 
 		try {
@@ -772,7 +788,7 @@ public final class RFace {
 	 * 
 	 * @return working directory
 	 * @throws RFaceException
-	 *             if probleming reading directory
+	 *             if problem getting directory
 	 */
 	public String getWd() throws RFaceException {
 		return evalReturnString("getwd()");

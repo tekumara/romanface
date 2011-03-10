@@ -163,6 +163,10 @@ public class RVector implements CBuilder {
 	/**
 	 * Return java type for given R expression object.
 	 * 
+	 * NB: If {@code rexp} is a {@link REXPLogical} then Byte.class is returned.
+	 * This is to accommodate NA values which are represented as
+	 * {@link REXPLogical#NA}.
+	 * 
 	 * @param rexp
 	 *            R expression object
 	 * @return java type
@@ -170,7 +174,7 @@ public class RVector implements CBuilder {
 	 *             if {@code rexp} is of a type that is not supported (ie: not
 	 *             yet implemented).
 	 */
-	private static Class<?> calcJavaType(Object rexp)
+	private static Class<?> calcJavaType(REXPVector rexp)
 			throws UnsupportedTypeException {
 		if (rexp instanceof REXPDouble) {
 			return Double.class;
@@ -179,7 +183,9 @@ public class RVector implements CBuilder {
 		} else if (rexp instanceof REXPInteger) {
 			return Integer.class;
 		} else if (rexp instanceof REXPLogical) {
-			return Boolean.class;
+			// returned as Byte because of NAs, which
+			// are represented as REXPLogical.NA (ie: -128)
+			return Byte.class;
 		} else if (rexp instanceof REXPString) {
 			return String.class;
 		} else if (rexp instanceof REXPRaw) {
@@ -192,6 +198,10 @@ public class RVector implements CBuilder {
 	/**
 	 * Creates a primitive array list of the appropriate type for the given
 	 * rexp.
+	 * 
+	 * NB: If {@code rexp} is a {@link REXPLogical} then a Byte list is
+	 * returned. This is to accommodate NA values which are represented as
+	 * {@link REXPLogical#NA}.
 	 * 
 	 * @param rexp
 	 *            an {@link REXPVector}.
@@ -211,7 +221,8 @@ public class RVector implements CBuilder {
 		} else if (rexp instanceof REXPInteger) {
 			return new IntArrayList(rexp.asIntegers());
 		} else if (rexp instanceof REXPLogical) {
-			return new IntArrayList(rexp.asIntegers());
+			// returned as byte[] of 0,1, or REXPLogical.NA (-128)
+			return new ByteArrayList(rexp.asBytes());
 		} else if (rexp instanceof REXPString) {
 			return Arrays.asList(rexp.asStrings());
 		} else if (rexp instanceof REXPRaw) {
@@ -370,8 +381,9 @@ public class RVector implements CBuilder {
 		} else if (values instanceof RList) {
 			return new REXPGenericVector((RList) values);
 		} else {
-			throw new UnsupportedTypeException("Unsupported backing list type "
-					+ values.getClass().getCanonicalName());
+			throw new UnsupportedTypeException(
+					"Unsupported backing list type "
+							+ values.getClass().getCanonicalName());
 		}
 
 	}

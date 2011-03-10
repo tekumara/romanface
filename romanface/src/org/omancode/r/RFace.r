@@ -2,8 +2,12 @@
 	## Parse then evaluate a character vector (expr), returning AND printing the
 	## result if the result is visible (ie: the REP parts of the REPL).
 	## Modelled on the source() function.
-	## Syntax errors will be produced by the parse function.
-	## Evaluation errors will be produced by the eval.with.vis function.
+	## Syntax errors will be produced by the parse function and result in 
+	## none of the code being executed.
+	## Evaluation errors will be produced by the eval.with.vis function and 
+	## will cause execution to stop and the rest of the expression will not 
+	## be executed. Anything assigned into the workspace by code that has 
+	## been run will be kept.
 	## Warnings are explicitly trapped and printed, because JRI doesn't
 	## output them to the console when options(warn = 0) for expressions 
 	## evaluated via calls to parseAndEval. 
@@ -18,6 +22,7 @@
 	
 	#wrap in try so if it errors this function will continue to execute 
 	#and print any warnings
+	#eval.with.vis returns a list with a "visible" element
 	result <- try(withCallingHandlers(
 		.Internal(eval.with.vis(parse(text=expr), .GlobalEnv, baseenv())),
 		
