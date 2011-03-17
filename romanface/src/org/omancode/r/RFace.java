@@ -2,7 +2,6 @@ package org.omancode.r;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -151,9 +150,8 @@ public final class RFace {
 	 * 
 	 * @param rloopHandler
 	 *            R REPL handler supplied by client.
-	 * @throws REngineException
-	 *             if R cannot be loaded.
 	 * @throws RFaceException
+	 *             if R cannot be loaded.
 	 */
 	private RFace(RMainLoopCallbacks rloopHandler) throws RFaceException {
 
@@ -171,6 +169,11 @@ public final class RFace {
 			rosudaEngine =
 					new JRIEngine(new String[] { "--no-save" }, rloopHandler);
 
+			// NB: we don't load the support functions here
+			// because the console may not yet be established
+			// and displayed and we will miss out on any
+			// warnings if the support function load fails.
+
 		} catch (REngineException e) {
 
 			// output diagnosis information
@@ -186,17 +189,21 @@ public final class RFace {
 
 	/**
 	 * Load support functions from support file. Provides support functions for
-	 * {@link #parseEvalPrint(String)}.
+	 * {@link #parseEvalPrint(String)} and
+	 * {@link org.omancode.r.ui.RObjectTreeBuilder}.
 	 * 
 	 * @throws IOException
 	 *             if problem loading file
 	 */
 	public void loadRSupportFunctions() throws IOException {
-		if (!supportFunctionsLoaded) {
-			InputStream ins = getClass().getResourceAsStream(SUPPORT_FILE);
-			parseEvalTry(RUtil.readRStream(ins));
-			supportFunctionsLoaded = true;
-		}
+		// InputStream ins = getClass().getResourceAsStream(SUPPORT_FILE);
+		// parseEvalTry(RUtil.readRStream(ins));
+
+		File supportFile =
+				new File(getClass().getResource(SUPPORT_FILE).getFile());
+		loadFile(supportFile);
+
+		supportFunctionsLoaded = true;
 	}
 
 	/**
@@ -430,6 +437,27 @@ public final class RFace {
 	 *             returned in the exception. Nothing printed to the console.
 	 */
 	public REXP parseEvalTry(String expr) throws RFaceException {
+		return parseEvalTry(expr, false);
+	}
+
+	/**
+	 * Wraps a parse and try around an eval. The parse will generate syntax
+	 * error messages, and the try will catch parse and evaluation errors and
+	 * return them in the exception.
+	 * 
+	 * @param expr
+	 *            expression to try and parse and eval
+	 * @param silent
+	 *            if {@code true} will not print anything to the console,
+	 *            otherwise error and warning messages will be displayed on the
+	 *            console
+	 * @return REXP result of the evaluation.
+	 * @throws RFaceException
+	 *             if there is a parse or evaluation error the error message is
+	 *             returned in the exception. Nothing printed to the console.
+	 */
+	public REXP parseEvalTry(String expr, boolean silent)
+			throws RFaceException {
 		if (!initialized()) {
 			throw new IllegalStateException(
 					"REngine has not been initialized.");
@@ -457,7 +485,9 @@ public final class RFace {
 			 * object (if it has one).
 			 * 
 			 */
-			String exec = "try(eval(parse(text=.expression.)), silent=TRUE)";
+			String exec =
+					"try(eval(parse(text=.expression.)), silent="
+							+ RUtil.rBoolean(silent) + ")";
 
 			REXP rexp = rosudaEngine.parseAndEval(exec);
 
@@ -557,7 +587,9 @@ public final class RFace {
 		}
 
 		try {
-			loadRSupportFunctions();
+			if (!supportFunctionsLoaded) {
+				loadRSupportFunctions();
+			}
 		} catch (IOException e1) {
 			throw new RuntimeException(e1);
 		}
@@ -567,11 +599,13 @@ public final class RFace {
 			/**
 			 * Place the expression in a character vector, syntax errors and
 			 * all. If we tried to execute the expression directly we might run
-			 * into syntax errors in the executing statement.
+			 * into syntax errors in the executing statement. This also avoids
+			 * the problem of having to search for and find quotes in string and
+			 * replace them.
 			 */
 			rosudaEngine.assign(".expression.", expr);
 
-			String exec = ".pep(.expression.)";
+			String exec = "pep(.expression.)";
 			// String exec = expr;
 
 			REXP result = rosudaEngine.parseAndEval(exec);
@@ -757,18 +791,52 @@ public final class RFace {
 	}
 
 	/**
-	 * Evaluate the contents of a file in R using the source() function.
+	 * Evaluate the contents of a file in R using the {@code source()} function.
 	 * 
 	 * @param file
 	 *            file containing R commands
 	 * @throws IOException
-	 *             if problem getting file path
+	 *             if problem getting file path, or problem evaluating file
 	 */
 	public void loadFile(File file) throws IOException {
 		String filename = sanitiseFilePath(file.getCanonicalPath());
 
-		String expr = "source(\"" + filename + "\")";
-		parseEvalPrint(expr);
+		String expr = "source(\"" + filename + "\", chdir=TRUE)";
+		parseEvalTry(expr);
+	}
+
+	/**
+	 * Creates an new named environment and attaches it, then evaluates the
+	 * contents of a file in R in that environment using the
+	 * {@code sys.source()} function.
+	 * 
+	 * @param file
+	 *            file containing R commands
+	 * @param environmentName
+	 *            name of the environment in which to evaluate the source file,
+	 *            or {@code null} to evaluate the source file in the global
+	 *            environment
+	 * @throws IOException
+	 *             if problem getting file path, or problem evaluating file
+	 */
+	public void loadFileIntoEnv(File file, String environmentName)
+			throws IOException {
+		String filename = sanitiseFilePath(file.getCanonicalPath());
+
+		parseEvalTry(".env <- attach(what = NULL, name='"
+				+ ((environmentName == null) ? ".GlobalEnv" : environmentName)
+				+ "')");
+
+		try {
+			parseEvalTry("sys.source('" + filename
+					+ "', chdir=TRUE, keep.source=TRUE, .env)");
+		} catch (RFaceException e) {
+			throw new RFaceException(file.getCanonicalPath() + " "
+					+ e.getMessage(), e);
+		}
+
+		parseEvalTry("rm(.env)");
+
 	}
 
 	/**

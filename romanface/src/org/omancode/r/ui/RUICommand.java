@@ -14,7 +14,8 @@ public interface RUICommand {
 
 	/**
 	 * The types of variable class this command works on. eg: "list",
-	 * "data.frame", "integer" etc. Or {@code null} to work on all objects.
+	 * "data.frame", "integer" etc. Use {@code null} to work on all objects. The
+	 * {@link RObjectTreeBuilder} will only display objects of these types.
 	 * 
 	 * @return string array of class type names.
 	 */
