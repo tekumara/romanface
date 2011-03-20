@@ -55,6 +55,8 @@
 		<!-- remove unoptimised jar -->
 		<delete file="${fastutil-lib}" />
 		
+		<copy file="${buildsupport.dir}/RSwingConsoleExample.bat" todir="${build.dir}"/>
+		
 	</target>
 	
 </project>	

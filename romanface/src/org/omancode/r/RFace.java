@@ -2,6 +2,7 @@ package org.omancode.r;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -196,14 +197,16 @@ public final class RFace {
 	 *             if problem loading file
 	 */
 	public void loadRSupportFunctions() throws IOException {
-		// InputStream ins = getClass().getResourceAsStream(SUPPORT_FILE);
-		// parseEvalTry(RUtil.readRStream(ins));
+		// NB: we access SUPPORT_FILE as a resource because it
+		// is packaged in a .jar. This means however that we need
+		// to read it as a stream and can't use loadFile()
 
-		File supportFile =
-				new File(getClass().getResource(SUPPORT_FILE).getFile());
-		loadFile(supportFile);
+		InputStream ins = getClass().getResourceAsStream(SUPPORT_FILE);
+		if (ins == null) {
+			throw new IOException("Resource " + SUPPORT_FILE + " not found.");
+		}
 
-		supportFunctionsLoaded = true;
+		parseEvalTry(RUtil.readRStream(ins));
 	}
 
 	/**
