@@ -6,7 +6,7 @@
 	
 	<!-- project specific javadoc properties -->
 	<presetdef name="javadoc-with-presets">
-		<javadoc overview="overview.html">
+		<javadoc overview="${src.dir}/overview.html">
 			<link href="http://java.sun.com/javase/6/docs/api/" />
 			<link href="http://www.rforge.net/org/docs/" />
 			<link href="http://casperdatasets.googlecode.com/svn/trunk/casperdatasets/documents/javadoc/" />
@@ -55,8 +55,16 @@
 		<!-- remove unoptimised jar -->
 		<delete file="${fastutil-lib}" />
 		
-		<copy file="${buildsupport.dir}/RSwingConsoleExample.bat" todir="${build.dir}"/>
+		<!-- delete jaropt log -->
+		<delete file="jaropt.log" />
 		
+	</target>
+
+	<target name="post-package" description="Post package">
+		<copy file="${buildsupport.dir}/RSwingConsoleExample.bat" todir="${build.dir}"/>
+
+		<!-- add RSwingConsoleExample.bat to zip -->
+		<zip destfile="${dist.dir}/${binary.plus.deps.zip}" update="true" basedir="${buildsupport.dir}" includes="RSwingConsoleExample.bat" />
 	</target>
 	
 </project>	
