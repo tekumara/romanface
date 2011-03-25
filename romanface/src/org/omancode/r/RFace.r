@@ -1,7 +1,7 @@
 pep <- function(expr) {
 	## Parse then evaluate a character vector (expr), returning AND printing the
 	## result if the result is visible (ie: the REP parts of the REPL).
-	pcr(expr)
+	pcpr(expr)
 }
 
 .pep <- function(expr) {
@@ -220,12 +220,10 @@ lsNoFunc <- function (...) {
 	result
 }
 
-# PCR (parse, capture all, return) functions for REPL imitation
-# -------------------------------------------------------------
+# PCPR (parse, capture all, print, return) functions for REPL imitation
+# ---------------------------------------------------------------------
 
-library(svMisc)
-
-pcr <- function (stringExpr) {
+pcpr <- function (stringExpr) {
 	#pcr - parse, capture all, return 
 	#based on svMisc::captureAll
 	#takes a character string and parses and then evaluates it, 
@@ -244,7 +242,7 @@ pcr <- function (stringExpr) {
 	#main evaluation loop
 	#evaluate each statement in the expression individually one at a time
 	tmp <- NULL
-	parsedExpr <- svMisc::Parse(stringExpr)
+	parsedExpr <- parseTxt(stringExpr)
 	for (i in 1:length(parsedExpr)) {
 		tmp <- .evalVis(parsedExpr[[i]])
 		
@@ -255,7 +253,7 @@ pcr <- function (stringExpr) {
 			last.warning <- attr(tmp, "last.warning")
 			
 			if (!is.null(last.warning)) {
-				cat(svMisc:::.gettext("In addition: "))
+				cat(.gettext("In addition: "))
 				.WarningMessage(last.warning)
 			}
 			break
@@ -274,6 +272,63 @@ pcr <- function (stringExpr) {
 	}
 }
 
+
+parseTxt <- function (text) {
+	#this is svMisc::parseText
+	text <- paste(text, collapse = "\n")
+	code <- textConnection(text)
+	expr <- try(parse(code), silent = TRUE)
+	close(code)
+	if (inherits(expr, "try-error")) {
+		if (.compareRVersion("2.9.0") < 0) {
+			toSearch <- paste("\n", length(strsplit(text, "\n")[[1]]) + 
+							1, ":", sep = "")
+		}
+		else {
+			toSearch <- paste(": ", length(strsplit(text, "\n")[[1]]) + 
+							1, ":0:", sep = "")
+		}
+		if (length(grep(toSearch, expr)) == 1) 
+			return(NA)
+		else return(expr)
+	}
+	dp <- deparse(expr)
+	if (regexpr("\\\\n\")$", dp) > 0 && regexpr("\n[\"'][ \t\r\n\v\f]*($|#.*$)", 
+			text) < 0) 
+		return(NA)
+	if (regexpr("\n`)$", dp) > 0 && regexpr("\n`[ \t\r\n\v\f]*($|#.*$)", 
+			text) < 0) 
+		return(NA)
+	return(expr)
+}
+
+.gettext <- function (msg, domain = "R") {
+	#this is svMisc:::.gettext
+	ngettext(1, msg, "", domain = domain)
+}
+
+.gettextf <- function (fmt, ..., domain = "R") {
+	#this is svMisc:::.gettextf
+	sprintf(ngettext(1, fmt, "", domain = domain), ...)
+}
+
+.compareRVersion <- function (version) {
+	#this is svMisc::compareRVersion
+	compareVersion(paste(R.version$major, R.version$minor, sep = "."), 
+			version)
+}
+
+TempEnv <- function () {
+	#this is svMisc::TempEnv
+	pos <- match("TempEnv", search())
+	if (is.na(pos)) {
+		TempEnv <- list()
+		attach(TempEnv, pos = length(search()) - 1)
+		rm(TempEnv)
+		pos <- match("TempEnv", search())
+	}
+	return(pos.to.env(pos))
+}
 
 .warningOverride <- function(..., call. = TRUE, immediate. = FALSE, 
 		domain = NULL) {
@@ -302,10 +357,10 @@ pcr <- function (stringExpr) {
 		print.warnings(warnings(" ", sep = ""))
 	}
 	else if (n.warn >= 50) {
-		cat(svMisc:::.gettext("There were 50 or more warnings (use warnings() to see the first 50)\n"))
+		cat(.gettext("There were 50 or more warnings (use warnings() to see the first 50)\n"))
 	}
 	else {
-		cat(svMisc:::.gettextf("There were %d warnings (use warnings() to see them)\n", 
+		cat(.gettextf("There were %d warnings (use warnings() to see them)\n", 
 						n.warn))
 	}
 	return(invisible(n.warn))
@@ -324,7 +379,7 @@ pcr <- function (stringExpr) {
 	res <- try(withCallingHandlers(.Internal(eval.with.vis(Expr, 
 									.GlobalEnv, baseenv())), 
 					warning = function(e) { .evalVisHandleWarning(e) }, 
-					interrupt = function(i) cat(svMisc:::.gettext("<INTERRUPTED!>\n")), 
+					interrupt = function(i) cat(.gettext("<INTERRUPTED!>\n")), 
 					error = function(e) { .evalVisHandleError(e) }, 
 					message = function(e) { .evalVisHandleMessage(e) }
 			), silent = TRUE)
@@ -347,7 +402,7 @@ pcr <- function (stringExpr) {
 	if (is.null(wl)) 
 		wl <- 1000
 	if (nchar(msg) > wl) 
-		msg <- paste(substr(msg, 1, wl), svMisc:::.gettext("[... truncated]"))
+		msg <- paste(substr(msg, 1, wl), .gettext("[... truncated]"))
 	Warn <- getOption("warn")
 	if (!is.null(call) && identical(call[[1]], quote(eval.with.vis))) 
 		e$call <- NULL
@@ -365,21 +420,21 @@ pcr <- function (stringExpr) {
 		return()
 	}
 	else if (Warn > 1) {
-		msg <- svMisc:::.gettextf("(converted from warning) %s", 
+		msg <- .gettextf("(converted from warning) %s", 
 				msg)
 		stop(simpleError(msg, call = call))
 	}
 	else {
 		if (!is.null(call)) {
 			dcall <- deparse(call)[1]
-			prefix <- paste(svMisc:::.gettext("Warning in"), dcall, 
+			prefix <- paste(.gettext("Warning in"), dcall, 
 					": ")
 			sm <- strsplit(msg, "\n")[[1]]
 			if (nchar(dcall, type = "w") + nchar(sm[1], 
 					type = "w") > 58) 
 				prefix <- paste(prefix, "\n  ", sep = "")
 		}
-		else prefix <- svMisc:::.gettext("Warning : ")
+		else prefix <- .gettext("Warning : ")
 		msg <- paste(prefix, msg, "\n", sep = "")
 		cat(msg)
 	}
@@ -393,14 +448,14 @@ pcr <- function (stringExpr) {
 		call <- NULL
 	if (!is.null(call)) {
 		dcall <- deparse(call)[1]
-		prefix <- paste(svMisc:::.gettext("Error in"), dcall, 
+		prefix <- paste(.gettext("Error in"), dcall, 
 				": ")
 		sm <- strsplit(msg, "\n")[[1]]
 		if (nchar(dcall, type = "w") + nchar(sm[1], 
 				type = "w") > 61) 
 			prefix <- paste(prefix, "\n  ", sep = "")
 	}
-	else prefix <- svMisc:::.gettext("Error: ")
+	else prefix <- .gettext("Error: ")
 	msg <- paste(prefix, msg, "\n", sep = "")
 	.Internal(seterrmessage(msg[1]))
 	if (identical(getOption("show.error.messages"), 
