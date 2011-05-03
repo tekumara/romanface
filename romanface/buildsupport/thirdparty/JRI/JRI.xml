@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<project name="JRI" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="name" value="${ant.project.name}" />
+
+	<!-- 
+	Fetched from the
+	<a href="http://www.rforge.net/rJava/">rJava</a>
+	project because this contains later versions of JRI than the 
+	<a href="http://www.rforge.net/JRI/">JRI homepage</a>. 
+	-->
+	<property name="src.url" value="http://www.rforge.net/rJava/snapshot/rJava_0.8-7.tar.gz" />
+	<property name="src.SHA" value="2ae92d85d2efcbb7f12a8c86da0a9102c92c3a92" />
+
+	<property name="pkg.dir" value="org/rosuda/JRI" />
+	
+	<!-- get filename only eg: rJava_0.8-7.tar.gz -->
+	<basename property="src.filename" file="${src.url}" />
+	<property name="src.url.cache" location="build" />
+	<property name="dest" value="${src.url.cache}${file.separator}${src.filename}" />
+
+	<property name="root.dir" location="build" />
+	<property name="src.dir" location="${root.dir}/rJava/jri" />
+
+	<property name="build.dir" location="${src.dir}/build" />
+	<property name="class.dir" location="${build.dir}/classes" />
+	<property name="doc.dir" location="${build.dir}/javadoc" />
+	<property name="dist.dir" location="dist" />
+
+	<property name="javac.debug" value="on" />
+
+	<target name="-testdownloaded" description="Set alreadydownloaded condition">
+		<condition property="alreadydownloaded">
+			<available file="${dest}" />
+		</condition>
+		<echo level="info" message="already downloaded: ${alreadydownloaded}" />
+	</target>
+
+
+	<target name="download" depends="-testdownloaded,init" description="Download the sources" unless="alreadydownloaded">
+		<get src="${src.url}" dest="${dest}" verbose="true" ignoreerrors="false" />
+	</target>
+
+	<target name="extract" depends="download" description="Extract the sources">
+		<fail message="SHA1 checksum verification for ${dest} failed, expected ${src.SHA}">
+			<condition>
+				<not>
+					<checksum file="${dest}" algorithm="SHA" property="${src.SHA}" />
+				</not>
+			</condition>
+		</fail>
+
+		<mkdir dir="${root.dir}" />
+		<untar src="${dest}" dest="${root.dir}" compression="gzip" />
+	</target>
+
+	<target name="clean" description="Deletes build directories">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="init">
+		<mkdir dir="${class.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!-- clean before building to remove old unused files in the build dirs -->
+	<target name="compile" depends="clean, init, extract" description="Compile Java code">
+		<javac fork="yes" srcdir="${src.dir}" debug="${javac.debug}" destdir="${class.dir}" includeantruntime="false" source="1.4" target="1.4">
+			<!-- only compile files in ${src.dir} and not subdirs -->
+			<include name="*.java" />
+		</javac>
+	</target>
+
+	<target name="javadoc" depends="compile" description="Generate JavaDocs">
+		<javadoc destdir="${doc.dir}" author="true" version="true" use="true">
+			<fileset dir="${src.dir}">
+				<include name="*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="package" depends="compile,javadoc" description="Generate JAR files">
+		<copy file="${src.dir}/NEWS" todir="${class.dir}" />
+		<jar destfile="${dist.dir}/${name}.jar" basedir="${class.dir}" />
+		<jar destfile="${dist.dir}/${name}-javadoc.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/${name}-sources.jar">
+			<zipfileset dir="${src.dir}" includes="*.java" prefix="${pkg.dir}"/>
+		</jar>
+	</target>
+
+    <target name="publish" description="Publish JARs to local ivy repository">
+    	<!-- do a resolve first. this places ivy.xml in the cache -->
+        <ivy:resolve />
+        <!-- delete the resolved/delivered ivy.xml file from previous publications 
+        	 this will be regenerated in the deliver performed by the publish -->
+        <delete file="${dist.dir}/ivy.xml"/>
+		<ivy:publish  
+			artifactspattern="${dist.dir}/[artifact](-[classifier]).[ext]"
+			status="release"
+        	overwrite="true"
+			resolver="local"
+		/>
+    </target>
+
+</project>
