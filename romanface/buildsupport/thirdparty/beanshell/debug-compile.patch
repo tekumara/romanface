@@ -1,0 +1,12 @@
+--- build.xml	2005-05-20 22:15:32.000000000 +1200
++++ build mod.xml	2010-12-06 16:28:15.709806600 +1300
+@@ -156,8 +156,7 @@
+ 		<javac srcdir="${src-dir}:${test-src-dir}:${bsf-src-dir}:${classgen-src-dir}"
+ 			destdir="${build-dir}"
+ 			deprecation="${deprecation}"
+-			optimize="on"
+-			debug="off"
++			debug="on"
+ 			includes="**/*.java"
+ 			excludes="${excludes},**/bak/**"
+ 		>

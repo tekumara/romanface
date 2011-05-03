@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<project name="bsh" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="name" value="${ant.project.name}" />
+	<property name="src.filename" value="bsh-2.0b4-src.jar" />
+									
+	<property name="src.url" value="http://beanshell2.googlecode.com/files/${src.filename}" />
+	<property name="src.SHA" value="69b36df249654a04e777ab899046c50b8cc844ac" />
+	<property name="src.compression" value="none" />
+
+	<property name="src.url.cache" location="build" />
+	<property name="dest" value="${src.url.cache}${file.separator}${src.filename}" />
+
+	<property name="root.dir" location="build" />
+	<property name="src.dir" location="${root.dir}/BeanShell-2.0b4" />
+
+	<property name="build.dir" location="${src.dir}/build" />
+	<property name="class.dir" location="${build.dir}/classes" />
+	<property name="doc.dir" location="${build.dir}/javadoc" />
+	<property name="dist.dir" location="dist" />
+
+	<property name="javac.debug" value="on" />
+
+	<target name="-testdownloaded" description="Set alreadydownloaded condition">
+		<condition property="alreadydownloaded">
+			<available file="${dest}" />
+		</condition>
+		<echo level="info" message="already downloaded: ${alreadydownloaded}" />
+	</target>
+
+
+	<target name="download" depends="-testdownloaded" description="Download the sources" unless="alreadydownloaded">
+		<mkdir dir="${src.url.cache}" />
+		<get src="${src.url}" dest="${dest}" verbose="true" />
+	</target>
+
+	<target name="-testextracted" description="Set already-extracted condition">
+		<condition property="already-extracted">
+			<available file="${src.dir}" type="dir" />
+		</condition>
+		<echo level="info" message="already extracted: ${already-extracted}" />
+	</target>
+	
+	<target name="extract" depends="-testextracted,download" description="Extract the sources" unless="already-extracted">
+		<fail message="SHA1 checksum verification for ${dest} failed, expected ${src.SHA}">
+			<condition>
+				<not>
+					<checksum file="${dest}" algorithm="SHA" property="${src.SHA}" />
+				</not>
+			</condition>
+		</fail>
+
+		<mkdir dir="${root.dir}" />
+		<unjar src="${dest}" dest="${root.dir}" />
+			
+		<!-- apply patch to enable debug info during compile -->
+		<patch patchfile="debug-compile.patch" dir="${src.dir}" backups="true"/>
+			
+		<!-- apply patch to enable correct return of EOL during input -->
+		<patch patchfile="no-unicode-EOL.patch" dir="${src.dir}/src/bsh/util" backups="true"/>
+	</target>
+
+	<target name="clean" description="Deletes build directories">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- clean before building to remove old unused files in the build dirs -->
+	<target name="compile" depends="clean, extract" description="Compile Java code">
+		<subant target="dist" buildpath="${src.dir}" />
+	</target>
+
+	<target name="package" depends="compile" description="Generate JAR files">
+		<mkdir dir="${dist.dir}" />
+        <move file="${src.dir}/dist/bsh-2.0b4.jar" tofile="${dist.dir}/${name}.jar"/>
+        <move file="${src.dir}/dist/bsh-2.0b4-javadoc.zip" tofile="${dist.dir}/${name}-javadoc.zip"/>
+        <move file="${src.dir}/dist/bsh-2.0b4-src.zip" tofile="${dist.dir}/${name}-sources.zip"/>
+   </target>
+
+    <target name="publish" description="Publish JARs to local ivy repository">
+    	<!-- do a resolve first. this places ivy.xml in the cache -->
+        <ivy:resolve />
+        <!-- delete the resolved/delivered ivy.xml file from previous publications 
+        	 this will be regenerated in the deliver performed by the publish -->
+        <delete file="${dist.dir}/ivy.xml"/>
+		<ivy:publish  
+			artifactspattern="${dist.dir}/[artifact](-[classifier]).[ext]"
+			status="release"
+        	overwrite="true"
+			resolver="local"
+		/>
+    </target>
+
+</project>

@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<project name="REngine" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="name" value="${ant.project.name}" />
+
+	<!-- 
+	Fetched and built from the<a href="http://rforge.net/Rserve/files/">Rserve</a> sources. 
+	-->
+	<property name="src.url" value="http://rforge.net/Rserve/snapshot/Rserve_0.6-3.tar.gz" />
+	<property name="src.SHA" value="4e055e5f93be6056cbe0ce16942fd472329858f0" />
+
+	<property name="pkg.dir" value="org/rosuda/REngine" />
+
+	<!-- get filename only -->
+	<basename property="src.filename" file="${src.url}" />
+	<property name="src.url.cache" location="build" />
+	<property name="dest" value="${src.url.cache}${file.separator}${src.filename}" />
+
+	<property name="root.dir" location="build" />
+	<property name="src.dir" location="${root.dir}/Rserve/src/client/java-new" />
+
+	<property name="build.dir" location="${src.dir}/build" />
+	<property name="class.dir" location="${build.dir}/classes" />
+	<property name="doc.dir" location="${build.dir}/javadoc" />
+	<property name="dist.dir" location="dist" />
+
+	<property name="javac.debug" value="on" />
+
+	<target name="resolve" description="resolve dependencies">
+		<!-- do a resolve and get the classpath to the ivy cache -->
+		<ivy:cachepath organisation="org.rosuda" module="JRI" inline="yes" pathid="ivycache.classpath" />
+	</target>
+
+	<target name="-testdownloaded" description="Set alreadydownloaded condition">
+		<condition property="alreadydownloaded">
+			<available file="${dest}" />
+		</condition>
+		<echo level="info" message="already downloaded: ${alreadydownloaded}" />
+	</target>
+
+
+	<target name="download" depends="-testdownloaded" description="Download the sources" unless="alreadydownloaded">
+		<mkdir dir="${src.url.cache}" />
+		<get src="${src.url}" dest="${dest}" verbose="true" ignoreerrors="false" />
+	</target>
+
+	<target name="-testextracted" description="Set already-extracted condition">
+		<condition property="already-extracted">
+			<available file="${src.dir}" type="dir" />
+		</condition>
+		<echo level="info" message="already extracted: ${already-extracted}" />
+	</target>
+
+	<target name="extract" depends="-testextracted,download" description="Extract the sources" unless="already-extracted">
+		<fail message="SHA1 checksum verification for ${dest} failed, expected ${src.SHA}">
+			<condition>
+				<not>
+					<checksum file="${dest}" algorithm="SHA" property="${src.SHA}" />
+				</not>
+			</condition>
+		</fail>
+
+		<mkdir dir="${root.dir}" />
+		<untar src="${dest}" dest="${root.dir}" compression="gzip" />
+	</target>
+
+	<target name="clean" description="Deletes build directories">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- clean before building to remove old unused files in the build dirs -->
+	<target name="compile" depends="clean, resolve, extract" description="Compile Java code">
+		<mkdir dir="${class.dir}" />
+		<javac fork="yes" srcdir="${src.dir}" debug="${javac.debug}" destdir="${class.dir}" includeantruntime="false" source="1.4" target="1.4" classpathref="ivycache.classpath">
+			<include name="*.java" />
+			<include name="JRI/*.java" />
+			<include name="Rserve/*.java" />
+			<include name="Rserve/protocol/*.java" />
+		</javac>
+	</target>
+
+	<target name="javadoc" depends="compile" description="Generate JavaDocs">
+		<javadoc destdir="${doc.dir}" author="true" version="true" use="true" classpathref="ivycache.classpath">
+			<fileset dir="${src.dir}">
+				<include name="*.java" />
+				<include name="JRI/*.java" />
+				<include name="Rserve/*.java" />
+				<include name="Rserve/protocol/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="package" depends="compile,javadoc" description="Generate JAR files">
+		<mkdir dir="${dist.dir}" />
+		<copy file="${root.dir}/Rserve/NEWS" todir="${class.dir}" />
+		<jar destfile="${dist.dir}/REngine.jar" basedir="${class.dir}">
+			<exclude name="**/JRI/" />
+		</jar>
+		<jar destfile="${dist.dir}/REngine-javadoc.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/REngine-sources.jar">
+			<zipfileset dir="${src.dir}" includes="*.java" prefix="${pkg.dir}" />
+		</jar>
+
+
+		<jar destfile="${dist.dir}/JRIEngine.jar" basedir="${class.dir}">
+			<include name="**/JRI/*" />
+		</jar>
+		<jar destfile="${dist.dir}/JRIEngine-javadoc.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/JRIEngine-sources.jar">
+			<zipfileset dir="${src.dir}" includes="JRI/*.java" prefix="${pkg.dir}" />
+		</jar>
+
+		<jar destfile="${dist.dir}/RserveEngine.jar" basedir="${class.dir}">
+			<include name="**/Rserve/*" />
+			<include name="**/Rserve/protocol/*" />
+		</jar>
+		<jar destfile="${dist.dir}/RserveEngine-javadoc.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/RserveEngine-sources.jar">
+			<zipfileset dir="${src.dir}" includes="Rserve/*.java,Rserve/protocol/*.java" prefix="${pkg.dir}" />
+		</jar>
+	</target>
+
+	<target name="publish" description="Publish JARs to local ivy repository">
+		<!-- do a resolve first. this places the JRI ivy.xml in the cache -->
+		<ivy:resolve />
+		<!-- delete the resolved/delivered ivy.xml file from previous publications 
+        	 this will be regenerated in the deliver performed by the publish -->
+		<delete file="${dist.dir}/ivy.xml" />
+		<ivy:publish artifactspattern="${dist.dir}/[artifact](-[classifier]).[ext]" status="release" overwrite="true" resolver="local" />
+	</target>
+
+</project>
