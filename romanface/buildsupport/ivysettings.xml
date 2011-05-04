@@ -6,4 +6,21 @@
 
 	<!-- make build.properties available for ivy.xml -->
 	<properties file="${ivy.basedir}/build.properties" />
+	
+	<resolvers>
+		<!-- the ivyroundup packager repo -->
+		<packager name="ivyroundup" buildRoot="${user.home}/.ivy2/packager/build"
+			resourceCache="${user.home}/.ivy2/packager/cache"
+			preserveBuildDirectories="true">
+			<ivy
+				pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/ivy.xml" />
+			<artifact
+				pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/packager.xml" />
+		</packager>
+	</resolvers>
+	
+	<modules>
+		<!--  define resolvers for specific modules -->
+		<module organisation="net.casper" resolver="ivyroundup" />
+	</modules>
 </ivysettings>
