@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		Copyright 2010 Oliver Mannion Licensed under the Apache License,
+		Version 2.0 (the "License"); you may not use this file except in
+		compliance with the License. You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+
+<ivy-module version="2.0">
+
+	<info organisation="org.rosuda" module="JRI" revision="0.5.5" status="release" publication="20101203140636">
+		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
+		<description homepage="http://www.rforge.net/rJava/">
+			JRI is a Java/R Interface, which allows to run R inside Java applications 
+			as a single thread. Basically it loads R dynamic library into Java and 
+			provides a Java API to R functionality. It supports both simple calls to 
+			R functions and a full running REPL. 
+		
+			Fetched from the
+			<a href="http://www.rforge.net/rJava/">rJava</a>
+			project because this contains later versions of JRI than the 
+			<a href="http://www.rforge.net/JRI/">JRI homepage</a>.
+		</description>
+	</info>
+
+	<publications>
+		<artifact/>
+		<artifact name="JRI-sources" type="source" ext="jar"/>
+		<artifact name="JRI-javadoc" type="javadoc" ext="jar"/>
+	</publications>
+
+</ivy-module>
