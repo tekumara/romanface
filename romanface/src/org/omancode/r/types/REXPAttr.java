@@ -5,8 +5,9 @@ import java.util.Arrays;
 import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
-import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPNull;
 import org.rosuda.REngine.REXPString;
+import org.rosuda.REngine.RList;
 
 /**
  * Static utility class for getting attributes of {@link REXP}s.
@@ -57,11 +58,10 @@ public final class REXPAttr {
 	 * @param rexp
 	 *            r expression
 	 * @return names attribute
-	 * @throws REXPMismatchException 
+	 * @throws RFaceException
 	 *             if problem determining {@code dimnames} attribute.
 	 */
-	public static String[] getNamesAttribute(REXP rexp)
-			throws REXPMismatchException {
+	public static String[] getNamesAttribute(REXP rexp) throws RFaceException {
 
 		REXPString namesAttribute = (REXPString) rexp.getAttribute("names");
 
@@ -69,7 +69,7 @@ public final class REXPAttr {
 		if (namesAttribute != null) {
 			names = namesAttribute.asStrings();
 		} else if (getDimensions(rexp) == 1) {
-			names = getDimNames(rexp);
+			names = getDimNames(rexp)[0];
 		}
 
 		return names;
@@ -103,7 +103,8 @@ public final class REXPAttr {
 			return null;
 		}
 
-		REXPString namesDimNames = (REXPString) dimNames.getAttribute("names");
+		REXPString namesDimNames =
+				(REXPString) dimNames.getAttribute("names");
 
 		if (namesDimNames == null) {
 			return null;
@@ -120,19 +121,43 @@ public final class REXPAttr {
 	 *            rexp
 	 * @return {@code dimnames}or {@code null} if there is no {@code dimnames}
 	 *         attribute.
-	 * @throws REXPMismatchException 
+	 * @throws RFaceException
 	 *             if problem determining {@code dimnames} attribute.
 	 */
-	public static String[] getDimNames(REXP rexp) throws REXPMismatchException {
+	public static String[][] getDimNames(REXP rexp) throws RFaceException {
 
-		REXPGenericVector dimNames = (REXPGenericVector) rexp
-				.getAttribute("dimnames");
+		REXPGenericVector dimNames =
+				(REXPGenericVector) rexp.getAttribute("dimnames");
 
 		if (dimNames == null) {
 			return null;
 		}
 
-		return dimNames.asList().at(0).asStrings();
+		RList dimNamesList = dimNames.asList();
+
+		int numDims = dimNamesList.size();
+
+		@SuppressWarnings("unchecked")
+		Object[] dimNamesElements = dimNamesList.toArray(new Object[numDims]);
+
+		String[][] dimNamesAsStrings = new String[numDims][];
+
+		for (int i = 0; i < numDims; i++) {
+			Object dnelement = dimNamesElements[i];
+
+			if (dnelement instanceof REXPNull) {
+				dimNamesAsStrings[i] = null;
+			} else if (dnelement instanceof REXPString) {
+				dimNamesAsStrings[i] = ((REXPString) dnelement).asStrings();
+			} else {
+				throw new RFaceException(rexp,
+						" has a dimnames element that is not "
+								+ "a REXPNull or REXPString");
+			}
+
+		}
+
+		return dimNamesAsStrings;
 
 	}
 }

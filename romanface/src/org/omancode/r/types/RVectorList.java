@@ -193,12 +193,12 @@ public class RVectorList implements List<RVector> {
 	 * @throws UnsupportedTypeException
 	 *             if {@code rlist} contains a type than cannot be converted to
 	 *             an {@link RVector}.
-	 * @throws REXPMismatchException
+	 * @throws RFaceException
 	 *             if problem determining {@code dimnames} attribute, or reading
 	 *             a {@link REXP} in the {@link RList}.
 	 */
 	public RVectorList(RList rlist) throws UnsupportedTypeException,
-			REXPMismatchException {
+			RFaceException {
 		vectors = new ArrayList<RVector>(rlist.size());
 
 		int index = 0;
@@ -207,8 +207,12 @@ public class RVectorList implements List<RVector> {
 			if (element instanceof REXPVector) {
 				REXPVector rexp = (REXPVector) element;
 
-				vectors.add(new RVector((String) rlist.names.get(index++),
-						rexp));
+				try {
+					vectors.add(new RVector(
+							(String) rlist.names.get(index++), rexp));
+				} catch (REXPMismatchException e) {
+					throw new RFaceException(e.getMessage(), e);
+				}
 			} else {
 				throw new UnsupportedTypeException("rlist contains "
 						+ element.getClass().getCanonicalName());

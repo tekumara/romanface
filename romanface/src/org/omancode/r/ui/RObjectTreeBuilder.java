@@ -71,16 +71,16 @@ public class RObjectTreeBuilder {
 	 *            name of a dataframe. If specified only this dataframe will be
 	 *            present in the tree. If {@code null} then all objects in the
 	 *            environment will be present in the tree.
-	 * @param includeClass
+	 * @param includeClasses
 	 *            specify the classes of object to display, or {@code null} to
 	 *            display objects of any class.
 	 * @throws RFaceException
 	 *             if problem getting objects
 	 */
 	public RObjectTreeBuilder(RFace rInterface, String dataframe,
-			String[] includeClass) throws RFaceException {
+			String[] includeClasses) throws RFaceException {
 		this.rInterface = rInterface;
-		this.include = RUtil.toVectorExprString(includeClass);
+		this.include = RUtil.toVectorExprString(includeClasses);
 
 		if (dataframe == null) {
 			root = new DefaultMutableTreeNode("R");

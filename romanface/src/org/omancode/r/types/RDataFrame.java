@@ -64,7 +64,7 @@ public class RDataFrame implements CBuilder {
 			columnTypes = calcColumnTypes(rvectors);
 			numRows = rvectors.get(0).size();
 		} catch (REXPMismatchException e) {
-			throw new RFaceException(e);
+			throw new RFaceException(e.getMessage(), e);
 		}
 	}
 

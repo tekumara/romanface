@@ -751,9 +751,11 @@ public final class RFace {
 			Object value = entry.getValue();
 
 			// convert value to REXP and store in hash
-			REXP rexp = REXPUtil.toREXP(value);
-			assign(".hashValue", rexp);
-			parseEvalTry(name + "[[\"" + key + "\"]] <- .hashValue");
+			if (!"".equals(key)) {
+				REXP rexp = REXPUtil.toREXP(value);
+				assign(".hashValue", rexp);
+				parseEvalTry(name + "[[\"" + key + "\"]] <- .hashValue");
+			}
 		}
 	}
 

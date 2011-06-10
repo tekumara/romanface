@@ -14,6 +14,7 @@ import java.util.Map;
 
 import net.casper.data.model.CBuilder;
 
+import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPFactor;
 import org.rosuda.REngine.REXPGenericVector;
@@ -153,9 +154,12 @@ public class RVector implements CBuilder {
 	 *             corresponding primitive list implementation exists)
 	 * @throws REXPMismatchException
 	 *             if problem determining {@code dimnames} attribute.
+	 * @throws RFaceException
+	 *             if problem determining {@code dimnames} attribute.
 	 */
 	public RVector(String name, REXPVector rexp)
-			throws UnsupportedTypeException, REXPMismatchException {
+			throws UnsupportedTypeException, REXPMismatchException,
+			RFaceException {
 		this(name, calcJavaType(rexp), createList(rexp), REXPAttr
 				.getNamesAttribute(rexp));
 	}

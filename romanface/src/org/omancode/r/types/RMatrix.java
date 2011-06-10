@@ -51,10 +51,10 @@ public class RMatrix implements CBuilder {
 	private final String name;
 
 	/**
-	 * The variable name for the {@link #rowNames}. This will the name header of
-	 * the first column. eg: "Frequency"
+	 * The rows and columns label. This will the name header of the first
+	 * column. eg: "Frequency"
 	 */
-	private final String rowVariableName;
+	private final String rowColLabel;
 
 	/**
 	 * Identifies the name of each row. This will be the first column in the
@@ -98,32 +98,34 @@ public class RMatrix implements CBuilder {
 			throw new RFaceException(rexp, "Cannot be accessed as a RMatrix");
 		}
 
-		// get names of the dimensions (dimnames)
+		// get names of the dimensions i.e.: names(dimnames)
 		String[] namesDimNames = REXPAttr.getNamesDimNames(rexp);
-		rowVariableName =
-				(namesDimNames == null) ? ""
-						: namesDimNames[0]
-								+ (!("".equals(namesDimNames[0])
-										|| "".equals(namesDimNames[1]) || (namesDimNames[1] == null)) ? " / "
-										: "")
-								+ ((namesDimNames[1] != null) ? namesDimNames[1]
-										: "");
+
+		String rowVariableName =
+				(namesDimNames == null) ? "" : (namesDimNames[0] == null ? ""
+						: namesDimNames[0]);
 		String colVariableName =
-				(namesDimNames == null) ? "" : namesDimNames[1];
-		this.name =
-				(name == null) ? rowVariableName + " by " + colVariableName
-						: name;
+				(namesDimNames == null) ? "" : (namesDimNames[1] == null ? ""
+						: namesDimNames[1]);
+
+		rowColLabel =
+				rowVariableName
+						+ (("".equals(rowVariableName) || ""
+								.equals(colVariableName)) ? "" : "/")
+						+ colVariableName;
+
+		this.name = (name == null) ? rowColLabel : name;
+
+		// get dimnames. if no column dimnames then create a string
+		// sequence
+		String[][] dimNames = REXPAttr.getDimNames(rexp);
+
+		rowNames = (dimNames == null) ? null : dimNames[0];
+		colNames =
+				(dimNames == null || dimNames[1] == null) ? seq(rexp.dim()[1])
+						: dimNames[1];
 
 		try {
-			// get rowNames & colNames from the dimnames attribute
-			RList dimnames = rexp.getAttribute("dimnames").asList();
-			if (dimnames.at(0).isString()) {
-				rowNames = ((REXPString) dimnames.at(0)).asStrings();
-			} else {
-				rowNames = null; // no row names
-			}
-			colNames = ((REXPString) dimnames.at(1)).asStrings();
-
 			// set values
 			values = rexp.asDoubleMatrix();
 			numRows = rexp.dim()[0];
@@ -132,6 +134,23 @@ public class RMatrix implements CBuilder {
 			throw new RFaceException(e);
 		}
 
+	}
+
+	/**
+	 * Generate an array strings that counts from 1 to num (inclusive).
+	 * 
+	 * @param num
+	 *            length of sequence
+	 * @return String array of sequence
+	 */
+	private static String[] seq(int num) {
+		String[] seq = new String[num];
+
+		for (int i = 0; i < num; i++) {
+			seq[i] = String.valueOf(i + 1);
+		}
+
+		return seq;
 	}
 
 	/**
@@ -168,7 +187,7 @@ public class RMatrix implements CBuilder {
 		} else {
 			// first column is the rows' variable name. The rest are the column
 			// dimnames.
-			return (String[]) ArrayUtils.add(colNames, 0, rowVariableName);
+			return (String[]) ArrayUtils.add(colNames, 0, rowColLabel);
 		}
 	}
 

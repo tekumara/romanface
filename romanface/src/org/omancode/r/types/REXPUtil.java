@@ -25,9 +25,9 @@ public final class REXPUtil {
 	 * 
 	 * @param array
 	 *            array to convert
-	 * @return {@link REXPVector}.
+	 * @return {@link REXPDouble}.
 	 */
-	public static REXPVector toVector(double[] array) {
+	public static REXPDouble toVector(double[] array) {
 		return new REXPDouble(array);
 	}
 
@@ -36,9 +36,9 @@ public final class REXPUtil {
 	 * 
 	 * @param array
 	 *            array to convert
-	 * @return {@link REXPVector}.
+	 * @return {@link REXPInteger}.
 	 */
-	public static REXPVector toVector(int[] array) {
+	public static REXPInteger toVector(int[] array) {
 		return new REXPInteger(array);
 	}
 
@@ -47,9 +47,9 @@ public final class REXPUtil {
 	 * 
 	 * @param array
 	 *            array to convert
-	 * @return {@link REXPVector}.
+	 * @return {@link REXPLogical}.
 	 */
-	public static REXPVector toVector(boolean[] array) {
+	public static REXPLogical toVector(boolean[] array) {
 		return new REXPLogical(array);
 	}
 
@@ -58,9 +58,9 @@ public final class REXPUtil {
 	 * 
 	 * @param array
 	 *            array to convert
-	 * @return {@link REXPVector}.
+	 * @return {@link REXPString}.
 	 */
-	public static REXPVector toVector(String[] array) {
+	public static REXPString toVector(String[] array) {
 		return new REXPString(array);
 	}
 
