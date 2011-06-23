@@ -8,12 +8,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.omancode.math.NamedNumber;
 import org.omancode.r.types.REXPAttr;
 import org.omancode.r.types.REXPUtil;
 import org.omancode.r.types.RMatrix;
 import org.omancode.util.ArrayUtil;
 import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPDouble;
+import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPNull;
 import org.rosuda.REngine.REXPString;
@@ -568,6 +571,57 @@ public final class RFace {
 	}
 
 	/**
+	 * Evaluates {@code expr} and returns an array of {@link NamedNumber}.
+	 * 
+	 * @param expr
+	 *            expression
+	 * @return named number array
+	 * @throws RFaceException
+	 *             if problem evaluating {@code expr}, including if {@code expr}
+	 *             does not return a {@link REXPDouble} or {@link REXPInteger}.
+	 */
+	public NamedNumber[] parseEvalTryReturnNamedNumber(String expr)
+			throws RFaceException {
+		REXP rexp = parseEvalTry(expr);
+
+		// r command must return a REXPDouble or REXPInteger
+		if (!(rexp instanceof REXPDouble || rexp instanceof REXPInteger)) {
+			throw new RFaceException(expr + " returned "
+					+ rexp.getClass().getCanonicalName());
+		}
+
+		try {
+
+			if (rexp.length() == 0) {
+				throw new RFaceException(expr + " returned no values.");
+			}
+
+			// get names. these are the factors.
+			String[] valueNames = REXPAttr.getNamesAttribute(rexp);
+
+			if (valueNames == null) {
+				throw new RFaceException("Result of " + expr
+						+ " does not supply names attribute.");
+			}
+
+			// get values
+			double[] values = rexp.asDoubles();
+
+			// create named nums
+			NamedNumber[] nums = new NamedNumber[values.length];
+			for (int i = 0; i < values.length; i++) {
+				nums[i] = new NamedNumber(valueNames[i], values[i]);
+			}
+
+			return nums;
+
+		} catch (REXPMismatchException e) {
+			throw new RFaceException(e.getMessage(), e);
+		}
+
+	}
+
+	/**
 	 * Wraps a parse around an eval and prints (shows) result. Returns the
 	 * expression result AND prints it to the console if it is visible, ie: the
 	 * REP parts of the REPL. Errors & warnings are output to the console, ie:
@@ -687,7 +741,7 @@ public final class RFace {
 
 	/**
 	 * Create an R expression in R as an object so it can be referenced (in the
-	 * global environment).
+	 * global environment). Uses the rosuda engine assign function.
 	 * 
 	 * @param name
 	 *            symbol name
@@ -704,6 +758,21 @@ public final class RFace {
 		} catch (REXPMismatchException e) {
 			throw new RFaceException(e);
 		}
+	}
+
+	/**
+	 * Assign a source expression to a variable using the assignment operator
+	 * <-.
+	 * 
+	 * @param x
+	 *            destination variable name
+	 * @param value
+	 *            source expression
+	 * @throws RFaceException
+	 *             if problem assigning
+	 */
+	public void assign(String x, String value) throws RFaceException {
+		parseEvalTry(x + " <- " + value);
 	}
 
 	/**
