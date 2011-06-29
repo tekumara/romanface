@@ -13,6 +13,7 @@ import org.omancode.r.types.REXPAttr;
 import org.omancode.r.types.REXPUtil;
 import org.omancode.r.types.RMatrix;
 import org.omancode.util.ArrayUtil;
+import org.omancode.util.StringUtil;
 import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
@@ -743,6 +744,10 @@ public final class RFace {
 	 * Create an R expression in R as an object so it can be referenced (in the
 	 * global environment). Uses the rosuda engine assign function.
 	 * 
+	 * NB: this assign does not use dispatch assignment methods, so it cannot be
+	 * used to set elements of vectors, lists, names, attributes, etc. For these
+	 * cases use {@link #assign(String, String)} instead.
+	 * 
 	 * @param name
 	 *            symbol name
 	 * @param rexp
@@ -762,7 +767,9 @@ public final class RFace {
 
 	/**
 	 * Assign a source expression to a variable using the assignment operator
-	 * <-.
+	 * <-. Can be used to set elements of vectors, lists, names, attributes,
+	 * etc.
+	 * 
 	 * 
 	 * @param x
 	 *            destination variable name
@@ -793,6 +800,39 @@ public final class RFace {
 
 			// assign the dataframe to a named R object
 			assign(name, dataframe);
+		} catch (REXPMismatchException e) {
+			throw new RFaceException(e);
+		}
+	}
+
+	/**
+	 * Create an {@link RList} in R as a matrix. All elements of {@code rlist}
+	 * must be of the same type and length.
+	 * 
+	 * @param name
+	 *            the name of the dataframe to create in R.
+	 * @param rlist
+	 *            the rlist
+	 * @throws RFaceException
+	 *             if problem assigning list
+	 */
+	public void assignMatrix(String name, RList rlist) throws RFaceException {
+		try {
+			// TODO: this is a quick nasty way, fix this up by
+			// creating directly as REXPVector with appropriate
+			// dims and names, doing checks on length and type.
+
+			// turn the rlist into a dataframe
+			REXP dataframe = REXP.createDataFrame(rlist);
+
+			// assign the list to a named R object
+			assign(name, dataframe);
+
+			// dfm <- as.matrix(df)
+			// rownames(dfm) <- .catadj[[1]]
+
+			assign(name, StringUtil.functionCall(".assignMatrix", name));
+
 		} catch (REXPMismatchException e) {
 			throw new RFaceException(e);
 		}

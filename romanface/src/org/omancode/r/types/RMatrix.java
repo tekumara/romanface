@@ -13,9 +13,8 @@ import org.omancode.rmt.cellreader.narrow.NarrowUtil;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPInteger;
+import org.rosuda.REngine.REXPLogical;
 import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RList;
 
 /**
  * An R expression that is a numeric matrix (ie: a 2D numeric vector). This
@@ -154,9 +153,9 @@ public class RMatrix implements CBuilder {
 	}
 
 	/**
-	 * Test whether rexp is a numeric matrix (ie: a {@link REXPDouble} or
-	 * {@link REXPInteger} with 2 dimensions). Includes objects of class
-	 * "table".
+	 * Test whether rexp is a numeric matrix (ie: a {@link REXPDouble},
+	 * {@link REXPInteger} or {@link REXPLogical} with 2 dimensions). Includes
+	 * objects of class "table".
 	 * 
 	 * @param rexp
 	 *            expression to test
@@ -164,7 +163,7 @@ public class RMatrix implements CBuilder {
 	 */
 	public static boolean isMatrix(REXP rexp) {
 
-		return ((rexp instanceof REXPDouble || rexp instanceof REXPInteger) && (REXPAttr
+		return ((rexp instanceof REXPDouble || rexp instanceof REXPInteger || rexp instanceof REXPLogical) && (REXPAttr
 				.getDimensions(rexp) == 2));
 	}
 

@@ -469,3 +469,12 @@ TempEnv <- function () {
 	signalCondition(e)
 	conditionMessage(e)
 }
+
+.assignMatrix <- function(df) {
+	#called from RFace.assignMatrix
+	#to convert dataframe save from RFace.assignDataFrame
+	#to a matrix
+	dfm <- as.matrix(df[-1])
+	rownames(dfm) <- df[[1]]
+	dfm
+}

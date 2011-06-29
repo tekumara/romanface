@@ -103,4 +103,16 @@ public final class RUtil {
 
 		return sb.toString();
 	}
+
+	/**
+	 * Returns o as a String, unless it is null and then return the string
+	 * "NULL".
+	 * 
+	 * @param o
+	 *            object
+	 * @return string
+	 */
+	public static String asNullString(Object o) {
+		return (o == null) ? "NULL" : o.toString();
+	}
 }
