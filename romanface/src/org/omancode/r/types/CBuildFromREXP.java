@@ -9,6 +9,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.omancode.r.RFaceException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPNull;
 import org.rosuda.REngine.REXPVector;
 
 /**
@@ -20,7 +21,7 @@ import org.rosuda.REngine.REXPVector;
 public class CBuildFromREXP implements CBuilder {
 
 	private final CBuilder builder;
-	
+
 	/**
 	 * Builds a Casper dataset from a {@link REXP}.
 	 * 
@@ -31,9 +32,8 @@ public class CBuildFromREXP implements CBuilder {
 	 * @throws RFaceException
 	 *             if dataset cannot be built from this REXP
 	 */
-	public CBuildFromREXP(REXP rexp, String name)
-			throws RFaceException {
-	
+	public CBuildFromREXP(REXP rexp, String name) throws RFaceException {
+
 		try {
 			if (RMatrix.isMatrix(rexp)) {
 				builder = new RMatrix(name, rexp);
@@ -41,8 +41,12 @@ public class CBuildFromREXP implements CBuilder {
 				builder = new RDataFrame(name, rexp);
 			} else if (rexp instanceof REXPVector) {
 				builder = new RVector(name, (REXPVector) rexp);
+			} else if (rexp instanceof REXPNull) {
+				throw new RFaceException("Building " + name
+						+ ": REXP is REXPNull");
 			} else {
-				throw new NotImplementedException(" REXP of class "
+				throw new NotImplementedException("Building " + name
+						+ ": REXP of class "
 						+ REXPAttr.getClassAttribute(rexp)
 						+ ".\nConversion of this class to "
 						+ "dataset not yet implemented.");
@@ -53,10 +57,9 @@ public class CBuildFromREXP implements CBuilder {
 		} catch (REXPMismatchException e) {
 			throw new RFaceException(e.getMessage(), e);
 		}
-	
+
 	}
 
-	
 	@Override
 	public String getName() {
 		return builder.getName();
