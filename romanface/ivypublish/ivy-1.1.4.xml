@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-	<info organisation="org.omancode" module="romanface" revision="1.1.3" status="release" publication="20110901144323">
+	<info organisation="org.omancode" module="romanface" revision="1.1.4" status="release" publication="20111104103122">
 		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
 		<description homepage="http://code.google.com/p/romanface/">
 		</description>

@@ -68,17 +68,6 @@ pep <- function(expr) {
 	}
 }
 
-lsNoFunc <- function (...) {
-	#eg: lsNoFunc(all.names=TRUE)
-	#displays objects as per ls() except for those that are functions
-	#eg: rm(list = lsNoFunc(all.names=TRUE))
-	#removes all objects (except functions)
-	objs <- ls(".GlobalEnv", ...)
-	klass <- sapply(objs, function(X) { class(get(X, pos=1)) })
-	klass <- .filter(klass, include = "all", exclude = "function")
-	names(klass)
-}
-
 .getObjects <- function (include = "all", exclude = "function") 
 {
 	#.getObjects() #show all except functions
