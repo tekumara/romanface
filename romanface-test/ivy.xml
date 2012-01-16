@@ -8,8 +8,10 @@
 	<dependencies>
 
         <dependency org="org.rosuda" name="JRI" rev="latest.integration"/>
+        <dependency org="org.rosuda" name="REngine" rev="latest.integration">
+        	<exclude name="RserveEngine.*" matcher="regexp"/>
+        </dependency> 
         <dependency org="org.beanshell" name="bsh" rev="2.0b4patched"/>
-        
         
     </dependencies>
 </ivy-module>
