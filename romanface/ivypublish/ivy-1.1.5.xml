@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-	<info organisation="org.omancode" module="romanface" revision="1.1.4" status="release" publication="20111104103122">
+	<info organisation="org.omancode" module="romanface" revision="1.1.5" status="release" publication="20120117142310">
 		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
 		<description homepage="http://code.google.com/p/romanface/">
 		</description>
@@ -21,8 +21,8 @@
 
 	<dependencies>
 		<dependency org="net.casper" name="casperdatasets" rev="2.0" revConstraint="latest.integration"/>
-		<dependency org="org.omancode" name="omcutil" rev="1.2.4" revConstraint="latest.integration" conf="*->@"/>
-		<dependency org="org.omancode" name="readmytables" rev="1.1" revConstraint="latest.integration" conf="*->@"/>
+		<dependency org="org.omancode" name="omcutil" rev="1.2.5" revConstraint="latest.integration" conf="*->@"/>
+		<dependency org="org.omancode" name="readmytables" rev="1.2.0" revConstraint="latest.integration" conf="*->@"/>
 
         <dependency org="org.rosuda" name="JRI" rev="0.5.5" revConstraint="latest.integration"/>
         <dependency org="org.rosuda" name="REngine" rev="0.6.3" revConstraint="latest.integration">

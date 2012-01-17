@@ -93,12 +93,13 @@
 		<mkdir dir="${dist.dir}" />
 		<property name="manifest" location="${dist.dir}/MANIFEST.MF" />
 		
+		<antcall target="pre-package" />
 		<manifestclasspath property="jar.classpath"
 				jarfile="${dist.dir}/${binary.jar}">
 			<classpath refid="build.classpath" />
 		</manifestclasspath>
 
-		<manifest-with-presets file="${manifest}" mode="replace">
+		<manifest-with-presets file="${manifest}" mode="update">
 			<attribute name="Built-By" value="${user.name}"/>
 			<attribute name="Implementation-Version" value="${version}"/>
 			<attribute name="Built-Date" value="${TODAY}"/>

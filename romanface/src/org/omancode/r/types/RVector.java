@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class RVector implements CBuilder {
 	private final Class<?> klass;
 
 	/**
-	 * Used by CBuilder. If not null with display as the first column of the
+	 * Used by CBuilder. If not null will display as the first column of the
 	 * dataset.
 	 */
 	private final String[] valueNames;
@@ -314,6 +315,26 @@ public class RVector implements CBuilder {
 	}
 
 	/**
+	 * Return the values in a map with String keys that are value names.
+	 * 
+	 * @return map
+	 */
+	public Map<String, Object> asMap() {
+
+		if (valueNames == null) {
+			throw new IllegalStateException("No names to use as keys.");
+		}
+
+		Map<String, Object> map = new HashMap<String, Object>(values.size());
+
+		for (int i = 0; i < valueNames.length; i++) {
+			map.put(valueNames[i], values.get(i));
+		}
+
+		return map;
+	}
+
+	/**
 	 * Returns the element at the specified index. The element is boxed before
 	 * being returned from the primitive list.
 	 * 
@@ -385,9 +406,8 @@ public class RVector implements CBuilder {
 		} else if (values instanceof RList) {
 			return new REXPGenericVector((RList) values);
 		} else {
-			throw new UnsupportedTypeException(
-					"Unsupported backing list type "
-							+ values.getClass().getCanonicalName());
+			throw new UnsupportedTypeException("Unsupported backing list type "
+					+ values.getClass().getCanonicalName());
 		}
 
 	}
