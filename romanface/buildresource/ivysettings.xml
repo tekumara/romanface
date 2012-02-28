@@ -22,6 +22,5 @@
 	<modules>
 		<!--  define resolvers for specific modules -->
 		<module organisation="net.casper" resolver="ivyroundup" />
-		<module organisation="it.unimi.dsi" resolver="ivyroundup" />
 	</modules>
 </ivysettings>
