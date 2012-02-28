@@ -29,7 +29,7 @@
         	<exclude name="RserveEngine.*" matcher="regexp"/>
         </dependency> 
 
-        <dependency org="dsi.unimi.it" name="fastutil" rev="latest.integration"/>
+        <dependency org="it.unimi.dsi" name="fastutil" rev="latest.integration"/>
         
         <dependency org="org.beanshell" name="bsh" rev="2.0b4patched"/>
         
