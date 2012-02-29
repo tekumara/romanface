@@ -90,4 +90,9 @@
 		/>
     </target>
 
+	
+    <target name="makepom" description="Convert ivy.xml to pom.xml for publishing in a maven repo">
+		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${dist.dir}/bsh.pom">
+		</ivy:makepom>
+	</target>
 </project>
