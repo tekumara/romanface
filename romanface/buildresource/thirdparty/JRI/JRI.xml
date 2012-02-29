@@ -2,7 +2,10 @@
 <project name="JRI" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="name" value="${ant.project.name}" />
-
+	<property name="version" value="0.5.5" />
+	<property name="maven.repo.dir" location="../repo" />
+	<property name="maven.repo.sub.dir" location="${maven.repo.dir}/org/rosuda/JRI/${version}" />
+	
 	<!-- 
 	Fetched from the
 	<a href="http://www.rforge.net/rJava/">rJava</a>
@@ -101,5 +104,12 @@
 			resolver="local"
 		/>
     </target>
+	
+    <target name="publish-local-maven-repo" description="Publish to local maven repo directory">
+    	<property name="artifact.name" value="${ant.project.name}-${version}" />
+    	<copy file="${dist.dir}/${name}.jar" tofile="${maven.repo.sub.dir}/${artifact.name}.jar"/>
+		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${maven.repo.sub.dir}/${artifact.name}.pom" />
+    	<echo message="Published to ${maven.repo.sub.dir}" level="info"/>
+	</target>
 
 </project>

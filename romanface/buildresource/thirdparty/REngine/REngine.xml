@@ -2,7 +2,10 @@
 <project name="REngine" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="name" value="${ant.project.name}" />
-
+	<property name="version" value="0.6.3" />
+	<property name="maven.repo.dir" location="../repo" />
+	<property name="maven.repo.sub.dir" location="${maven.repo.dir}/org/rosuda/REngine/${version}" />
+	
 	<!-- 
 	Fetched and built from the<a href="http://rforge.net/Rserve/files/">Rserve</a> sources. 
 	-->
@@ -129,4 +132,11 @@
 		<ivy:publish artifactspattern="${dist.dir}/[artifact](-[classifier]).[ext]" status="release" overwrite="true" resolver="local" />
 	</target>
 
+    <target name="publish-local-maven-repo" description="Publish to local maven repo directory">
+    	<property name="artifact.name" value="${ant.project.name}-${version}" />
+    	<copy file="${dist.dir}/${name}.jar" tofile="${maven.repo.sub.dir}/${artifact.name}.jar"/>
+		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${maven.repo.sub.dir}/${artifact.name}.pom" />
+    	<echo message="Published to ${maven.repo.sub.dir}" level="info"/>
+	</target>
+	
 </project>
