@@ -3,9 +3,8 @@
 
 	<property name="name" value="${ant.project.name}" />
 	<property name="src.filename" value="bsh-2.0b4-src.jar" />
+	<ivy:settings file="../ivysettings.xml" />
 	<property name="version" value="2.0b4patched" />
-	<property name="maven.repo.dir" location="../repo" />
-	<property name="maven.repo.sub.dir" location="${maven.repo.dir}/org/beanshell/bsh/${version}" />
 									
 	<property name="src.url" value="http://beanshell2.googlecode.com/files/${src.filename}" />
 	<property name="src.SHA" value="69b36df249654a04e777ab899046c50b8cc844ac" />
@@ -21,6 +20,15 @@
 	<property name="class.dir" location="${build.dir}/classes" />
 	<property name="doc.dir" location="${build.dir}/javadoc" />
 	<property name="dist.dir" location="dist" />
+
+	<!-- artifact names -->
+	<property name="binary.jar" value="${name}-${version}.jar" />
+	<property name="javadoc.jar" value="${name}-javadoc-${version}.jar" />
+	<property name="javadoc.zip" value="${name}-javadoc-${version}.zip" />
+	<property name="sources.jar" value="${name}-sources-${version}.jar" />
+	<property name="sources.zip" value="${name}-sources-${version}.zip" />
+	<property name="binary.plus.deps.zip" value="${name}-plus-deps-${version}.zip" />
+	<property name="pom-file" value="${name}-${version}.pom" />
 
 	<property name="javac.debug" value="on" />
 
@@ -74,12 +82,12 @@
 
 	<target name="package" depends="compile" description="Generate JAR files">
 		<mkdir dir="${dist.dir}" />
-        <move file="${src.dir}/dist/bsh-2.0b4.jar" tofile="${dist.dir}/${name}.jar"/>
-        <move file="${src.dir}/dist/bsh-2.0b4-javadoc.zip" tofile="${dist.dir}/${name}-javadoc.zip"/>
-        <move file="${src.dir}/dist/bsh-2.0b4-src.zip" tofile="${dist.dir}/${name}-sources.zip"/>
+        <move file="${src.dir}/dist/bsh-2.0b4.jar" tofile="${dist.dir}/${binary}.jar"/>
+        <move file="${src.dir}/dist/bsh-2.0b4-javadoc.zip" tofile="${dist.dir}/${javadoc.zip}"/>
+        <move file="${src.dir}/dist/bsh-2.0b4-src.zip" tofile="${dist.dir}/${sources.zip}"/>
    </target>
 
-    <target name="publish" description="Publish JARs to local ivy repository">
+    <target name="publish" depends="create-pom" description="Publish JARs to local ivy repository">
     	<!-- do a resolve first. this places ivy.xml in the cache -->
         <ivy:resolve />
         <!-- delete the resolved/delivered ivy.xml file from previous publications 
@@ -93,11 +101,24 @@
 		/>
     </target>
 
-    <target name="publish-local-maven-repo" description="Publish to local maven repo directory">
-    	<property name="artifact.name" value="${ant.project.name}-${version}" />
-    	<copy file="${dist.dir}/${name}.jar" tofile="${maven.repo.sub.dir}/${artifact.name}.jar"/>
-		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${maven.repo.sub.dir}/${artifact.name}.pom" />
-    	<echo message="Published to ${maven.repo.sub.dir}" level="info"/>
+	<target name="create-pom" description="Create Maven POM file based on ivy.xml">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="${dist.dir}/${pom-file}" conf="*">
+		    <!--
+		      Mapping confs to scopes is important, otherwise
+		      unmapped confs are included as optional. This makes
+		      dependencies with conf="*->@" non-optional and 
+		      part of the compile scope.
+		    -->
+		    <mapping conf="*" scope="compile"/>
+		</ivy:makepom>
+	</target>
+    	
+	<target name="publish-local-maven-repo" depends="create-pom" description="Publish artifacts to the local maven repo directory">
+		<!-- do a resolve first to get organisation property and other details from ivy.xml -->
+		<ivy:resolve file="ivy.xml"/>
+		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
+			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
+		</ivy:publish>
 	</target>
 	
 </project>

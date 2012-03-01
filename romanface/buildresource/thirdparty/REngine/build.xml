@@ -169,8 +169,6 @@
 		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
 			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
 		</ivy:publish>
-
-
 	</target>
 	
 </project>
