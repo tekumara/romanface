@@ -2,9 +2,9 @@
 <project name="REngine" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="name" value="${ant.project.name}" />
+	<ivy:settings file="../../ivysettings.xml" />
 	<property name="version" value="0.6.3" />
-	<property name="maven.repo.dir" location="../repo" />
-	<property name="maven.repo.sub.dir" location="${maven.repo.dir}/org/rosuda/REngine/${version}" />
+	<property name="pom-file" value="${name}-${version}.pom" />
 	
 	<!-- 
 	Fetched and built from the<a href="http://rforge.net/Rserve/files/">Rserve</a> sources. 
@@ -96,34 +96,34 @@
 	<target name="package" depends="compile,javadoc" description="Generate JAR files">
 		<mkdir dir="${dist.dir}" />
 		<copy file="${root.dir}/Rserve/NEWS" todir="${class.dir}" />
-		<jar destfile="${dist.dir}/REngine.jar" basedir="${class.dir}">
+		<jar destfile="${dist.dir}/REngine-${version}.jar" basedir="${class.dir}">
 			<exclude name="**/JRI/" />
 		</jar>
-		<jar destfile="${dist.dir}/REngine-javadoc.jar" basedir="${doc.dir}" />
-		<jar destfile="${dist.dir}/REngine-sources.jar">
+		<jar destfile="${dist.dir}/REngine-javadoc-${version}.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/REngine-sources-${version}.jar">
 			<zipfileset dir="${src.dir}" includes="*.java" prefix="${pkg.dir}" />
 		</jar>
 
 
-		<jar destfile="${dist.dir}/JRIEngine.jar" basedir="${class.dir}">
+		<jar destfile="${dist.dir}/JRIEngine-${version}.jar" basedir="${class.dir}">
 			<include name="**/JRI/*" />
 		</jar>
-		<jar destfile="${dist.dir}/JRIEngine-javadoc.jar" basedir="${doc.dir}" />
-		<jar destfile="${dist.dir}/JRIEngine-sources.jar">
+		<jar destfile="${dist.dir}/JRIEngine-javadoc-${version}.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/JRIEngine-sources-${version}.jar">
 			<zipfileset dir="${src.dir}" includes="JRI/*.java" prefix="${pkg.dir}" />
 		</jar>
 
-		<jar destfile="${dist.dir}/RserveEngine.jar" basedir="${class.dir}">
+		<jar destfile="${dist.dir}/RserveEngine-${version}.jar" basedir="${class.dir}">
 			<include name="**/Rserve/*" />
 			<include name="**/Rserve/protocol/*" />
 		</jar>
-		<jar destfile="${dist.dir}/RserveEngine-javadoc.jar" basedir="${doc.dir}" />
-		<jar destfile="${dist.dir}/RserveEngine-sources.jar">
+		<jar destfile="${dist.dir}/RserveEngine-javadoc-${version}.jar" basedir="${doc.dir}" />
+		<jar destfile="${dist.dir}/RserveEngine-sources-${version}.jar">
 			<zipfileset dir="${src.dir}" includes="Rserve/*.java,Rserve/protocol/*.java" prefix="${pkg.dir}" />
 		</jar>
 	</target>
 
-	<target name="publish" description="Publish JARs to local ivy repository">
+	<target name="publish" depends="create-pom" description="Publish JARs to local ivy repository">
 		<!-- do a resolve first. this places the JRI ivy.xml in the cache -->
 		<ivy:resolve />
 		<!-- delete the resolved/delivered ivy.xml file from previous publications 
@@ -131,12 +131,25 @@
 		<delete file="${dist.dir}/ivy.xml" />
 		<ivy:publish artifactspattern="${dist.dir}/[artifact](-[classifier]).[ext]" status="release" overwrite="true" resolver="local" />
 	</target>
-
-    <target name="publish-local-maven-repo" description="Publish to local maven repo directory">
-    	<property name="artifact.name" value="${ant.project.name}-${version}" />
-    	<copy file="${dist.dir}/${name}.jar" tofile="${maven.repo.sub.dir}/${artifact.name}.jar"/>
-		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" pomfile="${maven.repo.sub.dir}/${artifact.name}.pom" />
-    	<echo message="Published to ${maven.repo.sub.dir}" level="info"/>
+	
+	<target name="create-pom" description="Create Maven POM file based on ivy.xml">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="${dist.dir}/${pom-file}" conf="*">
+		    <!--
+		      Mapping confs to scopes is important, otherwise
+		      unmapped confs are included as optional. This makes
+		      dependencies with conf="*->@" non-optional and 
+		      part of the compile scope.
+		    -->
+		    <mapping conf="*" scope="compile"/>
+		</ivy:makepom>
+	</target>
+	
+	<target name="publish-local-maven-repo" depends="create-pom" description="Publish artifacts to the local maven repo directory">
+		<!-- do a resolve first to get organisation property and other details from ivy.xml -->
+		<ivy:resolve />
+		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
+			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
+		</ivy:publish>
 	</target>
 	
 </project>

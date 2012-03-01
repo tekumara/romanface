@@ -37,6 +37,7 @@
 		<artifact name="RserveEngine" ext="jar" />
 		<artifact name="RserveEngine-sources" type="source" ext="jar" />
 		<artifact name="RserveEngine-javadoc" type="javadoc" ext="jar" />
+		<artifact type="pom" ext="pom" conf="default"/>
 	</publications>
 	
 	<dependencies>
