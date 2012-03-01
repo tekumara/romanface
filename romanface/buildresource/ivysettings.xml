@@ -11,6 +11,10 @@
 	
 		<ibiblio name="romanface-repo" root="http://romanface.googlecode.com/git/romanface/buildresource/thirdparty/repo/" m2compatible="true" />
 		
+		<ibiblio name="omcutil-repo" root="http://omcutil.googlecode.com/git/repo/" m2compatible="true" />
+		
+		<ibiblio name="readmytables-repo" root="http://readmytables.googlecode.com/git/repo/" m2compatible="true" />
+		
 		<!-- the ivyroundup packager repo -->
 		<packager name="ivyroundup" buildRoot="${user.home}/.ivy2/packager/build"
 			resourceCache="${user.home}/.ivy2/packager/cache"
@@ -27,5 +31,7 @@
 		<module organisation="net.casper" resolver="ivyroundup" />
 		<module organisation="org.beanshell" resolver="romanface-repo" />
 		<module organisation="org.rosuda" resolver="romanface-repo" />
+		<module organisation="org.omancode" name="omcutil" resolver="omcutil-repo" />
+		<module organisation="org.omancode" name="readmytables" resolver="readmytables-repo" />
 	</modules>
 </ivysettings>
