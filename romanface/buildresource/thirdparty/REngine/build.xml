@@ -2,10 +2,9 @@
 <project name="REngine" default="package" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="name" value="${ant.project.name}" />
-	<ivy:settings file="../../ivysettings.xml" />
+	<ivy:settings file="../ivysettings.xml" />
 	<property name="version" value="0.6.3" />
-	<property name="pom-file" value="${name}-${version}.pom" />
-	
+
 	<!-- 
 	Fetched and built from the<a href="http://rforge.net/Rserve/files/">Rserve</a> sources. 
 	-->
@@ -27,10 +26,20 @@
 	<property name="doc.dir" location="${build.dir}/javadoc" />
 	<property name="dist.dir" location="dist" />
 
+	<property name="ivy-file-REngine" location="ivy-REngine.xml" />
+	<property name="ivy-file-JRIEngine" location="ivy-JRIEngine.xml" />
+	<property name="ivy-file-RserveEngine" location="ivy-RserveEngine.xml" />
+
+	<property name="pom-file-REngine" location="${dist.dir}/REngine-${version}.pom" />
+	<property name="pom-file-JRIEngine" location="${dist.dir}/JRIEngine-${version}.pom" />
+	<property name="pom-file-RserveEngine" location="${dist.dir}/RserveEngine-${version}.pom" />
+		
+		
 	<property name="javac.debug" value="on" />
 
 	<target name="resolve" description="resolve dependencies">
-		<!-- do a resolve and get the classpath to the ivy cache -->
+		<!-- do a resolve and get the classpath to JRI and store in ivycache.classpath
+		     for use during compile of REngine -->
 		<ivy:cachepath organisation="org.rosuda" module="JRI" inline="yes" pathid="ivycache.classpath" />
 	</target>
 
@@ -133,23 +142,35 @@
 	</target>
 	
 	<target name="create-pom" description="Create Maven POM file based on ivy.xml">
-		<ivy:makepom ivyfile="ivy.xml" pomfile="${dist.dir}/${pom-file}" conf="*">
-		    <!--
-		      Mapping confs to scopes is important, otherwise
-		      unmapped confs are included as optional. This makes
-		      dependencies with conf="*->@" non-optional and 
-		      part of the compile scope.
-		    -->
+		<ivy:makepom ivyfile="${ivy-file-REngine}" pomfile="${pom-file-REngine}"  conf="*">
+		    <mapping conf="*" scope="compile"/>
+		</ivy:makepom>
+		<ivy:makepom ivyfile="${ivy-file-JRIEngine}" pomfile="${pom-file-JRIEngine}"  conf="*">
+		    <mapping conf="*" scope="compile"/>
+		</ivy:makepom>
+		<ivy:makepom ivyfile="${ivy-file-RserveEngine}" pomfile="${pom-file-RserveEngine}"  conf="*">
 		    <mapping conf="*" scope="compile"/>
 		</ivy:makepom>
 	</target>
 	
 	<target name="publish-local-maven-repo" depends="create-pom" description="Publish artifacts to the local maven repo directory">
 		<!-- do a resolve first to get organisation property and other details from ivy.xml -->
-		<ivy:resolve />
+		<ivy:resolve file="${ivy-file-REngine}"/>
 		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
 			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
 		</ivy:publish>
+
+		<ivy:resolve file="${ivy-file-JRIEngine}"/>
+		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
+			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
+		</ivy:publish>
+
+		<ivy:resolve file="${ivy-file-RserveEngine}"/>
+		<ivy:publish resolver="local-maven-repo" forcedeliver="true" overwrite="true" publishivy="false">
+			<artifacts pattern="${dist.dir}/[artifact](-[classifier])-${version}.[ext]"/>
+		</ivy:publish>
+
+
 	</target>
 	
 </project>

@@ -9,8 +9,22 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.rosuda</groupId>
-  <artifactId>REngine</artifactId>
+  <artifactId>JRIEngine</artifactId>
   <packaging>jar</packaging>
   <version>0.6.3</version>
   <url>http://www.rforge.net/Rserve/</url>
+  <dependencies>
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>JRI</artifactId>
+      <version>latest.integration</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.rosuda</groupId>
+      <artifactId>REngine</artifactId>
+      <version>latest.integration</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>
