@@ -24,10 +24,7 @@
 		<dependency org="org.omancode" name="omcutil" rev="latest.integration" conf="*->@"/>
 		<dependency org="org.omancode" name="readmytables" rev="latest.integration" conf="*->@"/>
 
-        <dependency org="org.rosuda" name="JRI" rev="latest.integration"/>
-        <dependency org="org.rosuda" name="REngine" rev="latest.integration">
-        	<exclude name="RserveEngine.*" matcher="regexp"/>
-        </dependency> 
+        <dependency org="org.rosuda" name="JRIEngine" rev="latest.integration" />
 
         <dependency org="it.unimi.dsi" name="fastutil" rev="latest.integration"/>
         
