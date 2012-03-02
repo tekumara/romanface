@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
 
-	<info organisation="org.omancode" module="romanface" revision="1.1.5" status="release" publication="20120117142310">
+	<info organisation="org.omancode" module="romanface" revision="1.1.6" status="release" publication="20120302160245">
 		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
 		<description homepage="http://code.google.com/p/romanface/">
 		</description>
@@ -24,12 +24,9 @@
 		<dependency org="org.omancode" name="omcutil" rev="1.2.5" revConstraint="latest.integration" conf="*->@"/>
 		<dependency org="org.omancode" name="readmytables" rev="1.2.0" revConstraint="latest.integration" conf="*->@"/>
 
-        <dependency org="org.rosuda" name="JRI" rev="0.5.5" revConstraint="latest.integration"/>
-        <dependency org="org.rosuda" name="REngine" rev="0.6.3" revConstraint="latest.integration">
-        	<exclude name="RserveEngine.*" matcher="regexp"/>
-        </dependency> 
+        <dependency org="org.rosuda" name="JRIEngine" rev="0.6.3" revConstraint="latest.integration"/>
 
-        <dependency org="dsi.unimi.it" name="fastutil" rev="6.3" revConstraint="latest.integration"/>
+        <dependency org="it.unimi.dsi" name="fastutil" rev="6.4.4" revConstraint="latest.integration"/>
         
         <dependency org="org.beanshell" name="bsh" rev="2.0b4patched"/>
         
