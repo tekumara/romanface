@@ -15,7 +15,7 @@
 
 <ivy-module version="2.0">
 
-	<info organisation="org.rosuda" module="JRI" revision="0.5.5" status="release" publication="20101203140636">
+	<info organisation="org.rosuda" module="JRI" revision="0.5.5" status="release" publication="20120302140139">
 		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
 		<description homepage="http://www.rforge.net/rJava/">
 			JRI is a Java/R Interface, which allows to run R inside Java applications 
@@ -34,6 +34,7 @@
 		<artifact/>
 		<artifact name="JRI-sources" type="source" ext="jar"/>
 		<artifact name="JRI-javadoc" type="javadoc" ext="jar"/>
+		<artifact type="pom" ext="pom" conf="default"/>
 	</publications>
 
 </ivy-module>

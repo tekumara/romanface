@@ -15,21 +15,23 @@
 
 <ivy-module version="2.0">
 
-	<info organisation="org.beanshell" module="bsh" revision="2.0b4patched" status="release" publication="20101207175518">
-		<license name="SPL/LGPL" url="http://www.beanshell.org/license.html"/>
-		<description homepage="http://www.beanshell.org/">
-			BeanShell is a small, free,	embeddable Java source interpreter with object scripting
-			language features, written in Java. BeanShell dynamically executes
-			standard Java syntax and extends it with common scripting conveniences
-			such as	loose types, commands, and method closures like those in Perl
-			and	JavaScript. 
+	<info organisation="org.rosuda" module="RserveEngine" revision="0.6.3" status="release" publication="20120302140526">
+		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
+		<description homepage="http://www.rforge.net/Rserve/">
+			RserveEngine is a REngine implementation that connects to an Rserve via TCP/IP.
 		</description>
 	</info>
 
 	<publications>
 		<artifact/>
-		<artifact name="bsh-sources" type="source" ext="zip"/>
-		<artifact name="bsh-javadoc" type="javadoc" ext="zip"/>
+		<artifact name="RserveEngine-sources" type="source" ext="jar"/>
+		<artifact name="RserveEngine-javadoc" type="javadoc" ext="jar"/>
+		<artifact type="pom" ext="pom" conf="default"/>
 	</publications>
+	
+	<dependencies>
+        <dependency org="org.rosuda" name="REngine" rev="0.6.3" revConstraint="latest.integration"/>
+    </dependencies>
+	
 
 </ivy-module>
