@@ -9,7 +9,7 @@
 	
 	<resolvers>
 	
-		<ibiblio name="romanface-repo" root="http://romanface.googlecode.com/git/romanface/buildresource/thirdparty/repo/" m2compatible="true" />
+		<ibiblio name="romanface-repo" root="http://romanface.googlecode.com/git/repo/" m2compatible="true" />
 		
 		<ibiblio name="omcutil-repo" root="http://omcutil.googlecode.com/git/repo/" m2compatible="true" />
 		
