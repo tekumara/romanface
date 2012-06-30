@@ -365,8 +365,7 @@ TempEnv <- function () {
 						0) options(warning.expression = owarns)
 			})
 	
-	res <- try(withCallingHandlers(.Internal(eval.with.vis(Expr, 
-									.GlobalEnv, baseenv())), 
+	res <- try(withCallingHandlers(withVisible(eval(Expr,.GlobalEnv, baseenv())), 
 					warning = function(e) { .evalVisHandleWarning(e) }, 
 					interrupt = function(i) cat(.gettext("<INTERRUPTED!>\n")), 
 					error = function(e) { .evalVisHandleError(e) }, 
