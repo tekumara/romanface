@@ -15,7 +15,7 @@
 
 <ivy-module version="2.0">
 
-	<info organisation="org.rosuda" module="javaGD" revision="0.5.3"
+	<info organisation="org.rosuda" module="javaGD" revision="0.6.1"
 		status="release">
 		<license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html" />
 		<description homepage="http://www.rforge.net/JavaGD/">

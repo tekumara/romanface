@@ -3,10 +3,10 @@
 
 	<property name="name" value="${ant.project.name}" />
 	<ivy:settings file="../ivysettings.xml" />
-	<property name="version" value="0.5.5" />
+	<property name="version" value="0.6.1" />
 		
-	<property name="src.url" value="http://www.rforge.net/JavaGD/snapshot/JavaGD_0.5-3.tar.gz" />
-	<property name="src.SHA" value="314b45ec9974fbb1bb2a821849e3d503f4928abe" />
+	<property name="src.url" value="http://www.rforge.net/JavaGD/snapshot/JavaGD_0.6-1.tar.gz" />
+	<property name="src.SHA" value="255f5cd7fdd259c0161b95c5a825baa7f6eb7c61" />
 
 	<property name="pkg.dir" value="org/rosuda/javaGD" />
 
