@@ -9,8 +9,8 @@ Includes
     * Assignment of R objects.
     * Message output to the R console.
   * Java object representations of R matrices, dataframes, and vectors.
-    * Conversion of Java bean collections and [Casper datasets](http://code.google.com/p/casperdatasets/) to R dataframes
-    * Conversion of R dataframes, matrices and vectors to [Casper datasets](http://code.google.com/p/casperdatasets/)
+    * Conversion of Java bean collections and [Casper datasets](https://github.com/casperds/casperdatasets) to R dataframes
+    * Conversion of R dataframes, matrices and vectors to [Casper datasets](https://github.com/casperds/casperdatasets)
   * GUI elements including:
     * A Swing console with a command history
     * A JTree representing objects in the R environment
